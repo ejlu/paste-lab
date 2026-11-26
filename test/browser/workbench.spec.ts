@@ -123,3 +123,106 @@ test("native paste survives browsing the library and grid cells have one tab sto
     page.getByRole("button", { name: "B1 clipboard" }),
   ).toBeVisible();
 });
+
+test("download includes only selected clipboard payloads, types and expectations", async ({ page }) => {
+  const compact = "application/x-vnd.google-spreadsheet-compact-table+json";
+  const extra = "application/x-vnd.google-docs-internal-clip-id";
+  const formats = {
+    "text/plain": "displayed\r\n",
+    "text/html": "<table><tr><td>HTML-only value</td></tr></table>",
+    [compact]: '{"stored":"fixture data"}',
+    [extra]: "opt-in payload",
+  };
+  await page.goto("./");
+  await page.locator("#paste").evaluate((target, formats) => {
+    const data = new DataTransfer();
+    for (const [type, raw] of Object.entries(formats)) data.setData(type, raw);
+    target.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data }));
+  }, formats);
+
+  const save = page.getByRole("button", { name: "Save fixture" });
+  const choices = page.getByRole("group", { name: "Clipboard formats to save" });
+  const choice = (type: string) => choices.getByRole("checkbox", { name: type, exact: true });
+  const download = page.getByRole("button", { name: "Download JSON" });
+  const readDownload = async () => {
+    const pending = page.waitForEvent("download");
+    await download.click();
+    return JSON.parse(await readFile((await (await pending).path())!, "utf8"));
+  };
+
+  await save.click();
+  await expect(choices.getByRole("checkbox")).toHaveCount(4);
+  for (const type of ["text/plain", "text/html", compact]) await expect(choice(type)).toBeChecked();
+  await expect(choice(extra)).not.toBeChecked();
+  await page.getByRole("button", { name: "Use current parser output" }).click();
+  const defaults = await readDownload();
+  const { [extra]: privateValue, ...publicFormats } = formats;
+  expect(defaults.formats).toEqual(publicFormats);
+  expect(defaults.types.sort()).toEqual(Object.keys(publicFormats).sort());
+  expect(JSON.stringify(defaults)).not.toContain(privateValue);
+
+  await save.click();
+  await page.getByRole("button", { name: "Use current parser output" }).click();
+  await choice("text/html").uncheck();
+  await choice(extra).check();
+  const optedIn = await readDownload();
+  expect(optedIn.formats).toEqual({
+    "text/plain": formats["text/plain"], [compact]: formats[compact], [extra]: privateValue,
+  });
+  expect(optedIn.types.sort()).toEqual(Object.keys(optedIn.formats).sort());
+  expect(optedIn.expected).toEqual({ "text/plain": defaults.expected["text/plain"] });
+  expect(JSON.stringify(optedIn)).not.toContain("HTML-only value");
+
+  await save.click();
+  await expect(choice(extra)).not.toBeChecked();
+  for (const type of ["text/plain", "text/html", compact]) await choice(type).uncheck();
+  await expect(download).toBeDisabled();
+  await choice(extra).check();
+  const customOnly = await readDownload();
+  expect(customOnly.types).toEqual([extra]);
+  expect(customOnly.formats).toEqual({ [extra]: privateValue });
+  expect(customOnly.expected).toEqual({});
+});
+
+test("re-export of a library fixture lists retained types and preserves manual edits across toggles", async ({ page }) => {
+  await page.goto("./?fixture=sheets-single-number");
+  await page.getByRole("button", { name: "Save fixture" }).click();
+  const choices = page.getByRole("group", { name: "Clipboard formats to save" });
+  await expect(choices.getByRole("checkbox")).toHaveCount(3);
+  const html = choices.getByRole("checkbox", { name: "text/html", exact: true });
+  const field = page.getByLabel("Expected grids (JSON)");
+  const oracle = JSON.parse(await field.inputValue());
+  oracle["text/html"].rows[0][0] = "manually reviewed";
+  await field.fill(JSON.stringify(oracle));
+  await html.uncheck();
+  await html.check();
+  const pending = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download JSON" }).click();
+  const saved = JSON.parse(await readFile((await (await pending).path())!, "utf8"));
+  expect(saved.types.sort()).toEqual(Object.keys(saved.formats).sort());
+  expect(saved.types).not.toContain("application/x-vnd.google-docs-internal-clip-id");
+  expect(saved.expected).toEqual(oracle);
+});
+
+test("a custom-only paste starts with no selection and omits file data", async ({ page }) => {
+  await page.goto("./");
+  await page.locator("#paste").evaluate(target => {
+    const data = new DataTransfer();
+    data.items.add(new File(["test file content"], "sample.txt"));
+    data.setData("application/x-sample", "sample payload");
+    target.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data }));
+  });
+  await page.getByRole("button", { name: "Save fixture" }).click();
+  const choices = page.getByRole("group", { name: "Clipboard formats to save" });
+  await expect(choices.getByRole("checkbox")).toHaveCount(1);
+  await expect(choices.getByRole("status")).toHaveText("Select at least one format to download.");
+  const button = page.getByRole("button", { name: "Download JSON" });
+  await expect(button).toBeDisabled();
+  await choices.getByRole("checkbox", { name: "application/x-sample" }).check();
+  const pending = page.waitForEvent("download");
+  await button.click();
+  const saved = JSON.parse(await readFile((await (await pending).path())!, "utf8"));
+  expect(saved.types).toEqual(["application/x-sample"]);
+  expect(saved.formats).toEqual({ "application/x-sample": "sample payload" });
+  expect(saved.expected).toEqual({});
+});
