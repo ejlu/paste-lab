@@ -1,4 +1,4 @@
-import { parseFormat, ParseError } from "./parser.ts";
+import { maxCells, parseFormat, ParseError } from "./parser.ts";
 import type { Grid } from "./types.ts";
 
 export const sheetsCompact =
@@ -135,7 +135,8 @@ function readDisplay(
 function readCompact(
   raw: string | undefined,
   rows: Grid["rows"] | undefined,
-): { status: CompactStatus; values?: StoredGrid } {
+  allowTrailingBlank: boolean,
+): { status: CompactStatus; values?: StoredGrid; trailingBlank?: boolean } {
   if (raw === undefined) return { status: "missing" };
   if (raw === "") return { status: "empty" };
   if (raw.length > 1_000_000) return { status: "limit-exceeded" };
@@ -165,12 +166,14 @@ function readCompact(
     width <= 0
   )
     return { status: "unsupported-layout" };
-  if (height !== rows.length || width !== rows[0].length)
+  const trailingBlank =
+    allowTrailingBlank && width === 1 && height === rows.length + 1;
+  if (width !== rows[0].length || (height !== rows.length && !trailingBlank))
     return { status: "unaligned" };
   const values = storedValues(data["3"], data["2"], height * width);
-  return values
-    ? { status: "available", values }
-    : { status: "unsupported-layout" };
+  if (!values) return { status: "unsupported-layout" };
+  if (trailingBlank && values.at(-1) !== null) return { status: "unaligned" };
+  return { status: "available", values, trailingBlank };
 }
 
 export function compareClipboardFormats(
@@ -180,7 +183,29 @@ export function compareClipboardFormats(
   const html = readDisplay("text/html", formats["text/html"]);
   const plainGrid = plain.grid,
     htmlGrid = html.grid;
-  const rows = (plainGrid ?? htmlGrid)?.rows;
+  // TSV alone cannot distinguish a final record separator from one more empty
+  // single-column cell. Only extend a grid when a second format confirms it.
+  const plainRows = plainGrid?.rows;
+  const mayEndInBlank =
+    !!plainRows &&
+    plainRows.length < maxCells &&
+    /[\r\n]$/.test(formats["text/plain"]) &&
+    plainRows.every((row) => row.length === 1);
+  const lastHtmlRow = htmlGrid?.rows.at(-1);
+  if (
+    mayEndInBlank &&
+    htmlGrid &&
+    !htmlGrid.merges.length &&
+    htmlGrid.rows.length === plainRows.length + 1 &&
+    lastHtmlRow?.length === 1 &&
+    lastHtmlRow[0] === "" &&
+    plainRows.every(([value], r) =>
+      htmlGrid.rows[r].length === 1 && htmlGrid.rows[r][0] === value
+    )
+  ) {
+    plainRows.push([""]);
+  }
+  const rows = plainRows ?? htmlGrid?.rows;
   let alignment: ClipboardComparison["alignment"] = "aligned";
   if (!rows) alignment = "no-display";
   else if (htmlGrid?.merges.length) alignment = "merged-cells";
@@ -194,7 +219,9 @@ export function compareClipboardFormats(
   const compact = readCompact(
     formats[sheetsCompact],
     alignment === "aligned" ? rows : undefined,
+    mayEndInBlank && !htmlGrid,
   );
+  if (compact.trailingBlank) plainRows?.push([""]);
   const statuses = {
     "text/plain": plain.status,
     "text/html": html.status,

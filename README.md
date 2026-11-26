@@ -8,7 +8,7 @@ An in-browser clipboard inspector for people building spreadsheets, grids and ri
 
 ## TypeScript release candidate
 
-The local `paste-lab` package exports `compareClipboardFormats`. From the repository root, run `npm ci`, then `npm run pack:lib` and `npm run test:package -- ./paste-lab-0.1.0-rc.1.tgz`. The consumer test installs that archive in a fresh directory, compiles with strict NodeNext settings, and runs the fixture checks against the installed entry point. [Package API and example](packages/paste-lab/README.md)
+The local `paste-lab` package exports `compareClipboardFormats`. From the repository root, run `npm ci`, then `npm run pack:lib` and `npm run test:package -- ./paste-lab-0.1.0-rc.2.tgz`. The consumer test installs that archive in a fresh directory, compiles with strict NodeNext settings, and runs the fixture checks against the installed entry point. [Package API and example](packages/paste-lab/README.md)
 
 ## Run locally
 
@@ -62,6 +62,8 @@ These seven pairs were copied from Google Sheets and Microsoft Excel using inven
 | Boolean `TRUE` | Displays TRUE. The adapter skips the boolean encoding and requests review. [Capture](fixtures/sheets-boolean.json) | Displays TRUE and requests review. [Capture](fixtures/excel-boolean.json) |
 
 The [rounded-number capture](fixtures/sheets-rounded-number.json) contains a numeric `7.4` formatted to zero decimal places. Its plain text and HTML are identical to the [literal seven capture](fixtures/sheets-single-number.json). In the [inventory row](fixtures/sheets-rounded-quantity.json), a plain-text importer that accepts digit-only safe integers imports `SKU-R` with quantity `7`. The comparison helper reports display `"7"` and stored number `7.4`. The inventory importer requires whole units and sends the row to review.
+
+The [single-column trailing blank](fixtures/sheets-trailing-blank-column.json) copies K41:K42 with 37 above an empty cell. Its plain text is `"37\n"`. The HTML and compact data each confirm the second row. The comparison keeps both cells, while the standalone TSV parser reads one terminated record.
 
 The [mixed-blanks Sheets capture](fixtures/sheets-mixed-blanks.json) has five empty cells in a 6 × 4 range, including A1 and the consecutive pair B4:C4. Map B to Product ID and C to Quantity. Rows 2, 5 and 6 import as `SKU-A / 11`, `SKU-Z / 0` and `SKU-D / 43`. Row 3 needs a quantity. Row 4 needs both fields.
 

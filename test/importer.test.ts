@@ -327,3 +327,28 @@ test("an explicit blank and a stored empty string have distinct evidence", () =>
   assert.equal(blank.stored, null);
   assert.equal(blank.storedBlank, true);
 });
+
+test("a trailing separator only adds a row when the other format confirms the blank", () => {
+  const htmlColumn = (values: string[]) =>
+    "<table>" + values.map(value => "<tr><td>" + value + "</td></tr>").join("") + "</table>";
+  for (const [plain, values] of [
+    ["37", ["37", ""]], ["37\n", ["37", "5"]], ["37\n", ["other", ""]],
+    ["37\n", ["37", "", ""]], ["a\tb\n", ["a", ""]],
+  ] as const) {
+    const result = compareClipboardFormats({ "text/plain": plain, "text/html": htmlColumn([...values]) });
+    assert.equal(result.alignment, "shape-mismatch");
+    assert.deepEqual(result.cells, []);
+  }
+  for (const separator of ["\n", "\r", "\r\n"]) {
+    const result = compareClipboardFormats({
+      "text/plain": "37" + separator + separator, "text/html": htmlColumn(["37", "", ""]),
+    });
+    assert.deepEqual(result.cells.map(row => row[0].plain), ["37", "", ""]);
+    assert.equal(result.cells[2][0].storedBlank, undefined);
+  }
+  const compact = JSON.stringify({ "1": 1, "2": [195, 195], "3": { "1": [1, 1], "3": [37, 8] }, "15": { "1": 2, "2": 1 } });
+  const result = compareClipboardFormats({ "text/plain": "37\n", [sheetsCompact]: compact });
+  assert.equal(result.formats[sheetsCompact], "unaligned");
+  assert.equal(result.cells.length, 1);
+  assert.equal(result.cells[0][0].stored, null);
+});

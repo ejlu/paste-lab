@@ -1,7 +1,7 @@
 import type { Grid } from "./types.ts";
 import { type DefaultTreeAdapterTypes as Tree, parseFragment } from "parse5";
 
-const maxCells = 20000;
+export const maxCells = 20000;
 const maxLength = 1_000_000;
 
 export class ParseError extends Error {

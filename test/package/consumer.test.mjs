@@ -26,7 +26,10 @@ for (const [id, { formats, expected }] of captures) {
     }
     assert.equal(result.alignment, "aligned");
     for (const [field, type] of [["plain", "text/plain"], ["html", "text/html"]]) {
-      assert.deepEqual(result.cells.map(row => row.map(cell => cell[field])), expected[type].rows);
+      const rows = expected[type].rows;
+      // This capture's two display formats resolve the TSV's ambiguous final LF.
+      const compared = id === "sheets-trailing-blank-column" && field === "plain" ? [...rows, [""]] : rows;
+      assert.deepEqual(result.cells.map(row => row.map(cell => cell[field])), compared);
     }
     if (id.startsWith("excel-")) {
       assert.equal(result.formats[api.sheetsCompact], "missing");
@@ -79,4 +82,22 @@ test("unsupported Sheets metadata keeps the display and withholds all stored val
       assert.equal(cell.storedBlank, undefined);
     }
   }
+});
+
+test("trailing LF keeps the confirmed blank at its original coordinate", () => {
+  const { formats } = captures.get("sheets-trailing-blank-column");
+  assert.equal(formats["text/plain"], "37\n");
+  const result = api.compareClipboardFormats(formats);
+  assert.equal(result.alignment, "aligned");
+  assert.equal(result.formats[api.sheetsCompact], "available");
+  assert.deepEqual(result.cells, [
+    [{ plain: "37", html: "37", stored: 37, differences: [] }],
+    [{ plain: "", html: "", stored: null, storedBlank: true, differences: [] }],
+  ]);
+  const tsv = { "text/plain": formats["text/plain"] };
+  assert.equal(api.compareClipboardFormats(tsv).cells.length, 1);
+  const compactOnly = api.compareClipboardFormats({ ...tsv, [api.sheetsCompact]: formats[api.sheetsCompact] });
+  assert.deepEqual(compactOnly.cells[1][0], { plain: "", html: null, stored: null, storedBlank: true, differences: [] });
+  const displays = api.compareClipboardFormats({ ...tsv, "text/html": formats["text/html"] });
+  assert.deepEqual(displays.cells[1][0], { plain: "", html: "", stored: null, differences: [] });
 });
