@@ -1,0 +1,65 @@
+name: Merge Dependabot dev patches
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions: {}
+
+jobs:
+  merge:
+    if: >-
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.actor == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.commits == 1 &&
+      !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    steps:
+      # This job has a write token. Read verified metadata without checking out the PR.
+      - uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        id: metadata
+
+      - name: Merge the tested revision
+        if: steps.metadata.outputs.dependency-group == 'dev-patches'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          UPDATES: ${{ steps.metadata.outputs.updated-dependencies-json }}
+        run: |
+          if ! jq -e 'type == "array" and length > 0 and all(.[];
+            .packageEcosystem == "npm_and_yarn" and
+            .dependencyType == "direct:development" and
+            .updateType == "version-update:semver-patch" and
+            .dependencyName != "parse5")' <<< "$UPDATES" >/dev/null; then
+            echo "Outside the dev-patch policy; leaving for review."
+            exit 0
+          fi
+
+          files=$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/pulls/$PR/files")
+          if ! jq -e 'flatten | length > 0 and all(.[];
+            .status == "modified" and (.filename == "package.json" or .filename == "package-lock.json"))' \
+            <<< "$files" >/dev/null; then
+            echo "Files outside the root npm manifests changed; leaving for review."
+            exit 0
+          fi
+
+          # The PR workflow can start after this one. Wait for its run on this SHA.
+          runs="repos/$GITHUB_REPOSITORY/actions/workflows/check.yml/runs?event=pull_request&head_sha=$HEAD_SHA"
+          while true; do
+            conclusion=$(gh api "$runs" --jq '.workflow_runs[0].conclusion // "pending"')
+            case "$conclusion" in
+              success) break ;;
+              pending) sleep 10 ;;
+              *) echo "CI concluded with $conclusion; leaving for review."; exit 0 ;;
+            esac
+          done
+
+          # Merge only this SHA under the live branch rules. A later push needs fresh CI.
+          gh pr merge "$PR" --repo "$GITHUB_REPOSITORY" --squash --match-head-commit "$HEAD_SHA"
