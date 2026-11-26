@@ -10,5 +10,6 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["node", "vite/client"]
   },
+  "exclude": ["test/package"],
   "include": ["src", "test", "playwright.config.ts"]
 }

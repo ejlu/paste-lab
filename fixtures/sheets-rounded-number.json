@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "id": "sheets-rounded-number",
+  "title": "Rounded number",
+  "recipe": "Enter SKU-R in A1 and numeric 7.4 in B1. Select B1 and decrease decimal places once until it displays 7. Copy B1 alone.",
+  "source": {
+    "app": "Google Sheets",
+    "os": "macOS 26.6.1",
+    "browser": "Chrome 158.0.8127.37",
+    "method": "Browser paste event",
+    "edits": "Omitted the clipboard ID. Retained formats are unchanged."
+  },
+  "types": [
+    "text/plain",
+    "text/html",
+    "application/x-vnd.google-spreadsheet-compact-table+json",
+    "application/x-vnd.google-docs-internal-clip-id"
+  ],
+  "formats": {
+    "text/plain": "7",
+    "text/html": "<span style=\"font-size:10pt;font-family:Arial;font-style:normal;text-align:right;\" data-sheets-root=\"1\">7</span>",
+    "application/x-vnd.google-spreadsheet-compact-table+json": "{\"1\":1,\"2\":[195],\"3\":{\"1\":[1],\"3\":[7.4]},\"4\":[{\"2\":513,\"3\":{\"1\":2,\"2\":\"0\",\"3\":1},\"12\":0}],\"5\":[0],\"12\":[1],\"13\":[1],\"15\":{\"1\":1,\"2\":1},\"20\":1}"
+  },
+  "expected": {
+    "text/plain": {
+      "rows": [
+        [
+          "7"
+        ]
+      ],
+      "merges": []
+    },
+    "text/html": {
+      "rows": [
+        [
+          "7"
+        ]
+      ],
+      "merges": []
+    }
+  }
+}

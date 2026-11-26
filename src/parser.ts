@@ -1,7 +1,7 @@
 import type { Grid } from "./types.ts";
 import { type DefaultTreeAdapterTypes as Tree, parseFragment } from "parse5";
 
-const maxCells = 20000;
+export const maxCells = 20000;
 const maxLength = 1_000_000;
 
 export class ParseError extends Error {
@@ -112,15 +112,35 @@ function span(cell: Tree.Element, name: string) {
 }
 
 export function parseHTML(html: string): Grid {
+  const fragment = parseFragment(html);
   let table;
-  for (const node of walk(parseFragment(html))) {
+  for (const node of walk(fragment)) {
     if ("tagName" in node && node.tagName === "table") {
       table = node;
       break;
     }
   }
-  if (!table)
+  if (!table) {
+    // Sheets copies a single cell as one marked span instead of a table.
+    const roots = fragment.childNodes.filter(
+      (n) =>
+        !(
+          n.nodeName === "#text" &&
+          "value" in n &&
+          /^[\t\n\r ]*$/.test(n.value)
+        ),
+    );
+    const root = roots[0];
+    if (
+      roots.length === 1 &&
+      "tagName" in root &&
+      root.tagName === "span" &&
+      root.attrs.some((a) => a.name === "data-sheets-root" && a.value === "1")
+    ) {
+      return { rows: [[cellText(root)]], merges: [] };
+    }
     throw new ParseError("no-table", "No table found in the HTML payload.");
+  }
   const trs = [
     ...walk(table, (n) => n !== table && n.nodeName === "table"),
   ].filter((n): n is Tree.Element => "tagName" in n && n.tagName === "tr");

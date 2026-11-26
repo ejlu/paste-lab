@@ -1,3 +1,4 @@
+import { renderImportPreview } from "./import-preview.ts";
 import type { Fixture, Expected, Grid } from "./types.ts";
 import { ParseError, parseFormat } from "./parser.ts";
 import {
@@ -38,6 +39,7 @@ function element<K extends keyof HTMLElementTagNameMap>(tag: K, id: string) {
 }
 
 const ui = {
+  importer: element("section", "importer"),
   match: element("span", "match"),
   inspector: element("div", "inspector"),
   displayTitle: element("input", "display-title"),
@@ -126,6 +128,7 @@ function openFixture(f: Fixture) {
     ? "text/plain"
     : Object.keys(f.formats)[0];
   renderFormat();
+  renderImportPreview(ui.importer, f.formats);
 }
 
 function renderRaw() {
@@ -406,4 +409,5 @@ ui.form.onsubmit = (event) => {
       error instanceof Error ? error.message : String(error);
   }
 };
-openFixture(fixtures[0]);
+const requestedFixture = new URLSearchParams(location.search).get("fixture");
+openFixture(fixtures.find((f) => f.id === requestedFixture) ?? fixtures[0]);

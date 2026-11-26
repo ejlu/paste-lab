@@ -461,3 +461,57 @@ td.different {
 #title {
   scroll-margin-top: 16px;
 }
+
+#importer {
+  margin: 20px 0;
+  padding: clamp(14px, 2vw, 24px);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+#importer p {
+  margin: 8px 0 16px;
+  color: #50594e;
+  line-height: 1.45;
+}
+.import-fields {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.import-fields label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.import-fields input {
+  width: 6em;
+  padding: 8px;
+}
+.import-fields select {
+  max-width: min(220px, 100%);
+}
+.import-evidence {
+  overflow-x: auto;
+}
+.import-evidence table {
+  width: 100%;
+}
+.import-evidence td {
+  padding: 8px;
+}
+#importer output {
+  display: block;
+  margin-top: 14px;
+  padding: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #eef4eb;
+  font: 14px/1.5 var(--mono);
+}
+#importer output[data-state="review"] {
+  background: #fff0d2;
+}

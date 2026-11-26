@@ -3,3 +3,6 @@ dist/
 .DS_Store
 test-results/
 playwright-report/
+packages/paste-lab/lib/
+packages/paste-lab/LICENSE
+*.tgz

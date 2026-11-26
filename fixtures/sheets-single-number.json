@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "id": "sheets-single-number",
+  "title": "One numeric cell",
+  "recipe": "Enter the number 7 in B2 and copy B2 alone.",
+  "source": {
+    "app": "Google Sheets",
+    "os": "macOS 26.6.1",
+    "browser": "Chrome 158.0.8127.37",
+    "method": "Browser paste event",
+    "edits": "Omitted the clipboard ID. Retained formats are unchanged."
+  },
+  "types": [
+    "text/plain",
+    "text/html",
+    "application/x-vnd.google-spreadsheet-compact-table+json",
+    "application/x-vnd.google-docs-internal-clip-id"
+  ],
+  "formats": {
+    "text/plain": "7",
+    "text/html": "<span style=\"font-size:10pt;font-family:Arial;font-style:normal;text-align:right;\" data-sheets-root=\"1\">7</span>",
+    "application/x-vnd.google-spreadsheet-compact-table+json": "{\"1\":1,\"2\":[195],\"3\":{\"1\":[1],\"3\":[7]},\"4\":[{\"2\":513,\"3\":{\"1\":0},\"12\":0}],\"5\":[0],\"12\":[1],\"13\":[1],\"15\":{\"1\":1,\"2\":1},\"20\":1}"
+  },
+  "expected": {
+    "text/plain": {
+      "rows": [
+        [
+          "7"
+        ]
+      ],
+      "merges": []
+    },
+    "text/html": {
+      "rows": [
+        [
+          "7"
+        ]
+      ],
+      "merges": []
+    }
+  }
+}

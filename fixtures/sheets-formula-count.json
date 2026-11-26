@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "id": "sheets-formula-count",
+  "title": "Calculated count",
+  "recipe": "Enter SKU-F in A6 and the formula =3+4 in B6. Copy A6:B6 after the result displays 7.",
+  "source": {
+    "app": "Google Sheets",
+    "os": "macOS 26.6.1",
+    "browser": "Chrome 158.0.8127.37",
+    "method": "Browser paste event",
+    "edits": "Omitted the clipboard ID and wrapped document payload. Retained formats are unchanged."
+  },
+  "types": [
+    "text/plain",
+    "text/html",
+    "application/x-vnd.google-spreadsheet-compact-table+json",
+    "application/x-vnd.google-docs-embedded-grid_range_clip+wrapped",
+    "application/x-vnd.google-docs-internal-clip-id"
+  ],
+  "formats": {
+    "text/plain": "SKU-F\t7",
+    "text/html": "<google-sheets-html-origin><style type=\"text/css\"><!--td {border: 1px solid #cccccc;overflow: hidden;padding: 2px 3px 2px 3px;vertical-align: bottom;}br {mso-data-placement:same-cell;}--></style><table xmlns=\"http://www.w3.org/1999/xhtml\" cellspacing=\"0\" cellpadding=\"0\" dir=\"ltr\" border=\"1\" style=\"table-layout:fixed;font-size:10pt;font-family:Arial;width:0px;border-collapse:collapse;border:none\" data-sheets-root=\"1\" data-sheets-baot=\"1\"><colgroup><col width=\"100\"/><col width=\"100\"/></colgroup><tbody><tr><td>SKU-F</td><td style=\"text-align:right;\">7</td></tr></tbody></table>",
+    "application/x-vnd.google-spreadsheet-compact-table+json": "{\"1\":1,\"2\":[195,203],\"3\":{\"1\":[2,1],\"3\":[7],\"4\":[\"SKU-F\"]},\"4\":[{\"2\":4224,\"10\":2,\"15\":\"Arial\"},{\"2\":4288,\"9\":2,\"10\":2,\"15\":\"Arial\"}],\"5\":[0,1],\"8\":[\"=3+4\"],\"9\":[0],\"12\":[-2,1],\"13\":[-2,1],\"15\":{\"1\":1,\"2\":2},\"20\":2}"
+  },
+  "expected": {
+    "text/plain": {
+      "rows": [
+        [
+          "SKU-F",
+          "7"
+        ]
+      ],
+      "merges": []
+    },
+    "text/html": {
+      "rows": [
+        [
+          "SKU-F",
+          "7"
+        ]
+      ],
+      "merges": []
+    }
+  }
+}
