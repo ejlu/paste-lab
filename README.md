@@ -33,14 +33,14 @@ Open the local address printed by Vite. Choose **Product codes** and switch betw
 
 1. Copy a range, focus **Inspect your clipboard**, and paste. The app reads the string formats exposed by that paste event. Reloading clears your live capture.
 2. Choose a format. Plain text and HTML produce a grid. Other string formats have a raw view. Enable **Show whitespace** to see spaces (·), nonbreaking spaces (⍽), tabs (⇥), CR (␍), and LF (↵).
-3. Select **Save fixture**, name the capture, and fill in its source labels. Enter expected grids independently or choose **Use current parser output** and review the result.
+3. Select **Save fixture**, choose the clipboard formats to include, name the capture, and fill in its source labels. Enter expected grids independently or choose **Use current parser output** and review the result.
 4. Download the JSON, place it in `fixtures/`, and run `npm test`. The test runner discovers it automatically. The fixture library includes it the next time the app builds.
 
 For a format that fails to parse, use an expectation such as `{"error":"no-table"}`. The runner checks the stable parser error code and continues to test the other formats.
 
 The grid shows whether each parsed format matches its saved expectation. Use the arrow keys to move between cells. **My latest paste** restores your capture after exploring the library.
 
-The download preserves the original captured strings, including line endings. Files are listed by type, with no binary content collected. Pasted data stays in memory. Review payloads before publishing them since spreadsheet HTML and custom formats can include local paths, formulas and document identifiers.
+The dialog preselects plain text, HTML, and Google Sheets compact-table data when present. Other captured string formats are opt-in. The JSON lists only selected formats and preserves their original strings, including line endings. The capture details in the workbench still list all advertised types. Binary file contents are never captured. Pasted data stays in memory. Review payloads before publishing them since spreadsheet HTML and custom formats can include local paths, formulas and document identifiers.
 
 ## Clipboard fixtures
 
@@ -53,7 +53,7 @@ The download preserves the original captured strings, including line endings. Fi
 | [Sheets merged header](fixtures/sheets-merged-header.json) | Compare the empty B1 field in TSV with the two-column HTML span anchored at A1. |
 | [Excel significant whitespace](fixtures/excel-significant-whitespace.json) | The third cell ends with U+0020 in plain text and U+00A0 inside an Excel spacerun in HTML. |
 
-Each JSON includes the recreation recipe, source, captured formats and hand-authored expectations for each grid parser. The examples use invented data. Excel 16.115.2 captures came from the macOS native pasteboard's text and HTML representations. Two local file URL prefixes in each Excel HTML sample were redacted. Sheets captures came through a Chrome 158 paste event on the same Mac. The public fixtures retain Sheets' text, HTML and compact-table JSON and list the omitted private clipboard types when present.
+Each JSON includes the recreation recipe, source, captured formats and hand-authored expectations for each grid parser. The examples use invented data. Excel 16.115.2 captures came from the macOS native pasteboard's text and HTML representations. Two local file URL prefixes in each Excel HTML sample were redacted. Sheets captures came through a Chrome 158 paste event on the same Mac. The original Sheets fixtures list advertised private types as provenance and retain text, HTML and compact-table JSON. Re-exporting any fixture through the dialog lists only the selected payload types in the new JSON.
 
 ### Inventory importer results
 
