@@ -1,3 +1,4 @@
+import { sheetsCompact } from "./compare.ts";
 import { renderImportPreview } from "./import-preview.ts";
 import type { Fixture, Expected, Grid } from "./types.ts";
 import { ParseError, parseFormat } from "./parser.ts";
@@ -62,6 +63,9 @@ const ui = {
   paste: element("textarea", "paste"),
   status: element("p", "status"),
   save: element("button", "save"),
+  exportFormats: element("div", "export-formats"),
+  exportStatus: element("p", "export-status"),
+  download: element("button", "download"),
   name: element("input", "name"),
   expected: element("textarea", "expected"),
   error: element("p", "error"),
@@ -333,7 +337,40 @@ ui.paste.onpaste = (event) => {
 };
 ui.format.onchange = renderFormat;
 ui.spaces.onchange = renderRaw;
+const defaultExportTypes = new Set<string>([...gridFormats, sheetsCompact]);
+
+function selectedExportTypes(): string[] {
+  return Array.from(
+    ui.exportFormats.querySelectorAll<HTMLInputElement>("input:checked"),
+    (input) => input.value,
+  );
+}
+
+function updateExportControls() {
+  const types = selectedExportTypes();
+  ui.download.disabled = types.length === 0;
+  ui.exportStatus.textContent = types.length
+    ? `${types.length} ${types.length === 1 ? "format" : "formats"} selected.`
+    : "Select at least one format to download.";
+  const hasGrid = gridFormats.some((type) => types.includes(type));
+  ui.expected.disabled = !hasGrid;
+  ui.usePreview.disabled = !hasGrid;
+}
+
+ui.exportFormats.onchange = updateExportControls;
 ui.save.onclick = () => {
+  ui.exportFormats.replaceChildren(
+    ...Object.keys(active.formats).map((type) => {
+      const label = el("label");
+      const input = el("input");
+      input.type = "checkbox";
+      input.value = type;
+      input.checked = defaultExportTypes.has(type);
+      label.append(input, el("span", type));
+      return label;
+    }),
+  );
+  updateExportControls();
   ui.name.value = active.id;
   ui.displayTitle.value = active === recent ? "" : active.title;
   ui.recipeInput.value = active.recipe;
@@ -350,8 +387,9 @@ ui.expected.oninput = () => {
 ui.usePreview.onclick = () => {
   try {
     const expected: Expected = {};
+    const types = selectedExportTypes();
     for (const format of gridFormats) {
-      if (!Object.hasOwn(active.formats, format)) continue;
+      if (!types.includes(format)) continue;
       try {
         expected[format] = parseFormat(format, active.formats[format]);
       } catch (err) {
@@ -376,15 +414,27 @@ ui.form.onsubmit = (event) => {
       throw new Error(
         "Use letters, numbers, dashes or underscores in the fixture name.",
       );
-    const expected = checkExpected(
-      JSON.parse(ui.expected.value),
-      active.formats,
+    const types = selectedExportTypes();
+    if (!types.length) throw new Error("Select at least one clipboard format.");
+    const formats = Object.fromEntries(
+      types.map((type) => [type, active.formats[type]]),
     );
+    // Keep manual edits in the dialog when a checkbox changes, but omit
+    // deselected grids from both validation and the downloaded fixture.
+    const draft = ui.expected.disabled ? {} : JSON.parse(ui.expected.value);
+    if (draft && typeof draft === "object" && !Array.isArray(draft)) {
+      for (const type of gridFormats) {
+        if (Object.hasOwn(active.formats, type) && !types.includes(type)) delete draft[type];
+      }
+    }
+    const expected = checkExpected(draft, formats);
     const source = { ...active.source };
     for (const key of ["app", "browser", "os"] as const)
       source[key] = ui[key].value.trim();
     const fixture: Fixture = {
       ...active,
+      types,
+      formats,
       id,
       title: ui.displayTitle.value.trim() || id,
       recipe: ui.recipeInput.value.trim(),

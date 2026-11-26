@@ -82,7 +82,15 @@
     <dialog id="dialog" aria-labelledby="save-title">
       <form id="form">
         <h2 id="save-title">Save fixture</h2>
-        <p>Review the expected grids, then download the JSON file.</p>
+        <fieldset aria-describedby="export-note">
+          <legend>Clipboard formats to save</legend>
+          <p id="export-note">
+            Review the selected data before sharing. It can include hidden cell
+            values, file paths, links, and document identifiers.
+          </p>
+          <div id="export-formats"></div>
+          <p id="export-status" role="status"></p>
+        </fieldset>
         <label>Fixture name<input required maxlength="80" id="name" /></label>
         <label
           >Display title<input
@@ -110,14 +118,11 @@
           ></textarea>
         </label>
         <button type="button" id="usePreview">Use current parser output</button>
-        <p class="muted">
-          The download includes captured text and HTML. Review any private
-          values before sharing.
-        </p>
+        <p class="muted">Only expected grids for selected formats are saved.</p>
         <p id="error" role="alert"></p>
         <footer>
           <button type="button" id="cancel">Cancel</button
-          ><button class="primary">Download JSON ↓</button>
+          ><button class="primary" id="download">Download JSON ↓</button>
         </footer>
       </form>
     </dialog>
