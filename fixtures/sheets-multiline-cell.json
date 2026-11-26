@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "id": "sheets-multiline-cell",
+  "title": "Multiline cell",
+  "recipe": "Enter Item, Notes and Owner across row 1. Enter Parcel, a two-line note (Call first followed by Use side door), and Maya across row 2. Copy A1:C2.",
+  "source": {
+    "app": "Google Sheets",
+    "os": "macOS 26.6.1",
+    "browser": "Chrome 158",
+    "method": "Browser paste event",
+    "edits": "Omitted the wrapped document payload and clipboard ID. Retained formats are unchanged."
+  },
+  "types": [
+    "text/plain",
+    "text/html",
+    "application/x-vnd.google-spreadsheet-compact-table+json",
+    "application/x-vnd.google-docs-embedded-grid_range_clip+wrapped",
+    "application/x-vnd.google-docs-internal-clip-id"
+  ],
+  "formats": {
+    "text/plain": "Item\tNotes\tOwner\nParcel\t\"Call first\nUse side door\"\tMaya",
+    "text/html": "<google-sheets-html-origin><style type=\"text/css\"><!--td {border: 1px solid #cccccc;overflow: hidden;padding: 2px 3px 2px 3px;vertical-align: bottom;}br {mso-data-placement:same-cell;}--></style><table xmlns=\"http://www.w3.org/1999/xhtml\" cellspacing=\"0\" cellpadding=\"0\" dir=\"ltr\" border=\"1\" style=\"table-layout:fixed;font-size:10pt;font-family:Arial;width:0px;border-collapse:collapse;border:none\" data-sheets-root=\"1\" data-sheets-baot=\"1\"><colgroup><col width=\"100\"/><col width=\"100\"/><col width=\"100\"/></colgroup><tbody><tr><td>Item</td><td>Notes</td><td>Owner</td></tr><tr><td>Parcel</td><td>Call first<br/>Use side door</td><td>Maya</td></tr></tbody></table>",
+    "application/x-vnd.google-spreadsheet-compact-table+json": "{\"1\":1,\"2\":[-4,195,203,195],\"3\":{\"1\":[2,2,2,2,2,2],\"4\":[\"Item\",\"Notes\",\"Owner\",\"Parcel\",\"Call first\\nUse side door\",\"Maya\"]},\"4\":[{\"2\":4224,\"10\":2,\"15\":\"Arial\"}],\"5\":[-6,0],\"8\":[\"=\\\"Call first\\\"&CHAR(10)&\\\"Use side door\\\"\"],\"9\":[0],\"12\":[-6,1],\"13\":[-6,1],\"15\":{\"1\":2,\"2\":3},\"20\":6}"
+  },
+  "expected": {
+    "text/plain": {
+      "rows": [
+        [
+          "Item",
+          "Notes",
+          "Owner"
+        ],
+        [
+          "Parcel",
+          "Call first\nUse side door",
+          "Maya"
+        ]
+      ],
+      "merges": []
+    },
+    "text/html": {
+      "rows": [
+        [
+          "Item",
+          "Notes",
+          "Owner"
+        ],
+        [
+          "Parcel",
+          "Call first\nUse side door",
+          "Maya"
+        ]
+      ],
+      "merges": []
+    }
+  }
+}

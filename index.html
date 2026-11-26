@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f5f0" />
+    <title>Paste Lab · Clipboard inspector</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <header>
+      <span class="mark" aria-hidden="true">▦</span><strong>Paste Lab</strong
+      ><span class="divider">/</span><span>Clipboard inspector</span>
+    </header>
+    <main>
+      <aside aria-label="Captures">
+        <h2>Fixture library</h2>
+        <nav id="library" aria-label="Built-in fixtures"></nav>
+        <label class="pastebox" for="paste">Inspect your clipboard</label>
+        <textarea
+          id="paste"
+          rows="2"
+          placeholder="Click here, then paste a range"
+          spellcheck="false"
+        ></textarea>
+        <p class="muted">Clipboard data stays in this tab.</p>
+        <p id="status" role="status"></p>
+      </aside>
+      <article>
+        <div class="topline">
+          <div>
+            <p id="source" class="eyebrow"></p>
+            <h1 id="title"></h1>
+          </div>
+          <button id="save" class="primary">Save fixture ↓</button>
+        </div>
+        <p id="recipe"></p>
+        <section class="panel" aria-label="Clipboard and grid">
+          <div class="payload">
+            <div class="panelhead">
+              <h2>Clipboard</h2>
+              <select id="format" aria-label="Clipboard format"></select>
+            </div>
+            <div class="raw">
+              <pre id="raw" tabindex="0"></pre>
+              <div class="rawfoot">
+                <label
+                  ><input type="checkbox" id="spaces" checked /> Show
+                  whitespace</label
+                ><span id="length"></span>
+              </div>
+            </div>
+          </div>
+          <div class="result">
+            <div class="panelhead gridhead">
+              <h2>Parsed grid</h2>
+              <span id="size"></span>
+            </div>
+            <div id="grid" class="gridwrap"></div>
+            <div class="inspect">
+              <b id="address">Cell</b>
+              <div>
+                <code id="value"></code>
+                <p id="points"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <details id="provenance">
+          <summary>Capture details</summary>
+          <p id="details"></p>
+        </details>
+      </article>
+    </main>
+    <dialog id="dialog">
+      <form id="form">
+        <h2>Save fixture</h2>
+        <p>Review the expected grids, then download the JSON file.</p>
+        <label>Fixture name<input required maxlength="80" id="name" /></label>
+        <div class="fields">
+          <label>Source app<input id="app" placeholder="e.g. Excel" /></label
+          ><label
+            >Operating system<input id="os" placeholder="e.g. macOS"
+          /></label>
+        </div>
+        <label
+          >Browser<input id="browser" placeholder="e.g. Chrome 158"
+        /></label>
+        <label
+          >Expected grids (JSON)<textarea
+            id="expected"
+            required
+            rows="7"
+            spellcheck="false"
+          ></textarea>
+        </label>
+        <button type="button" id="usePreview">Use current parser output</button>
+        <p class="muted">
+          The download includes captured text and HTML. Review any private
+          values before sharing.
+        </p>
+        <p id="error" role="alert"></p>
+        <footer>
+          <button type="button" id="cancel">Cancel</button
+          ><button class="primary">Download JSON ↓</button>
+        </footer>
+      </form>
+    </dialog>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
