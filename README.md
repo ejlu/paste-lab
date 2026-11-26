@@ -59,3 +59,11 @@ To exercise the regression suite, replace the TSV parser temporarily with a spli
 MIT licensed.
 
 For the browser checks, run `npx playwright install chromium` followed by `npm run test:browser`. They exercise a live page, fixture downloads and the mobile layout.
+
+## Product IDs and quantities
+
+Open **Product codes → Google Sheets** in the fixture library and scroll to **Inventory import preview**. Row 2 displays `00123` in both columns. With A mapped to Product ID and B to Quantity, the importer emits `{"productId":"00123","quantity":123}`. Map B to both fields to see the same cell imported two ways. Map A to Quantity to see a text-only quantity sent for review.
+
+[compareClipboardFormats](src/importer.ts) compares plain text, HTML table text and typed values by cell position. The prototype understands the dense text-and-number layout observed in the Sheets compact-table capture. This is an undocumented format. Unsupported layouts and missing metadata leave the stored value unavailable. The helper returns each representation separately and identifies display disagreements or a difference between display and storage. Merged ranges and mismatched dimensions are left for review.
+
+The example importer preserves the exact displayed product ID and requires a nonnegative safe integer from a numeric source for quantity. A numeric-looking string alone requires review. The preview maps one data row at a time and treats the first row of a multirow paste as column names.
