@@ -429,3 +429,35 @@ table {
     background: #fafbf7;
   }
 }
+
+[hidden] {
+  display: none !important;
+}
+#match:not(:empty) {
+  display: block;
+  align-self: flex-start;
+  margin: 12px 16px 0;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #eaf1e8;
+  color: #38533a;
+  font: 12px/1.5 var(--mono);
+}
+#match[data-result="difference"],
+td.different {
+  background: #fff0d2;
+  color: #704409;
+}
+.gridwrap [role="alert"] {
+  color: #8c352d;
+}
+#raw {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+#recent[aria-pressed="true"] {
+  border-color: var(--blue);
+}
+#title {
+  scroll-margin-top: 16px;
+}

@@ -19,11 +19,13 @@
         <label class="pastebox" for="paste">Inspect your clipboard</label>
         <textarea
           id="paste"
+          readonly
           rows="2"
           placeholder="Click here, then paste a range"
           spellcheck="false"
         ></textarea>
         <p class="muted">Clipboard data stays in this tab.</p>
+        <button id="recent" type="button" hidden>My latest paste</button>
         <p id="status" role="status"></p>
       </aside>
       <article>
@@ -42,7 +44,7 @@
               <select id="format" aria-label="Clipboard format"></select>
             </div>
             <div class="raw">
-              <pre id="raw" tabindex="0"></pre>
+              <pre aria-label="Raw clipboard text" id="raw" tabindex="0"></pre>
               <div class="rawfoot">
                 <label
                   ><input type="checkbox" id="spaces" checked /> Show
@@ -56,8 +58,9 @@
               <h2>Parsed grid</h2>
               <span id="size"></span>
             </div>
+            <span id="match" aria-live="polite"></span>
             <div id="grid" class="gridwrap"></div>
-            <div class="inspect">
+            <div class="inspect" id="inspector" aria-live="polite">
               <b id="address">Cell</b>
               <div>
                 <code id="value"></code>
@@ -72,11 +75,19 @@
         </details>
       </article>
     </main>
-    <dialog id="dialog">
+    <dialog id="dialog" aria-labelledby="save-title">
       <form id="form">
-        <h2>Save fixture</h2>
+        <h2 id="save-title">Save fixture</h2>
         <p>Review the expected grids, then download the JSON file.</p>
         <label>Fixture name<input required maxlength="80" id="name" /></label>
+        <label
+          >Display title<input
+            id="display-title"
+            placeholder="Defaults to fixture name"
+        /></label>
+        <label
+          >Recreation recipe<textarea id="recipe-input" rows="2"></textarea>
+        </label>
         <div class="fields">
           <label>Source app<input id="app" placeholder="e.g. Excel" /></label
           ><label
@@ -106,6 +117,6 @@
         </footer>
       </form>
     </dialog>
-    <script type="module" src="./src/app.js"></script>
+    <script type="module" src="./src/app.ts"></script>
   </body>
 </html>

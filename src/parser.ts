@@ -1,17 +1,29 @@
-import { parseFragment } from "parse5";
+import type { Grid } from "./types.ts";
+import { type DefaultTreeAdapterTypes as Tree, parseFragment } from "parse5";
 
 const maxCells = 20000;
 const maxLength = 1_000_000;
 
+export class ParseError extends Error {
+  readonly code: string;
+  constructor(code: string, message: string) {
+    super(message);
+    this.code = code;
+  }
+}
+
 function tooLarge() {
-  throw new Error("This range exceeds the 20,000-cell preview limit.");
+  throw new ParseError(
+    "grid-limit",
+    "This range exceeds the 20,000-cell preview limit.",
+  );
 }
 
 // One trailing record separator terminates the last row. Delimiters inside
 // quoted fields are data. Preserve CR, LF and CRLF inside those fields.
-export function parseText(text) {
+export function parseText(text: string): Grid {
   const rows = [];
-  let row = [];
+  let row: string[] = [];
   let value = "";
   let quoted = false;
   let endedRow = false;
@@ -29,6 +41,12 @@ export function parseText(text) {
         value += '"';
         i++;
       } else {
+        const next = text[i + 1];
+        if (next !== undefined && !/[\t\r\n]/.test(next))
+          throw new ParseError(
+            "invalid-quote",
+            "Unexpected text after a closing TSV quote.",
+          );
         quoted = false;
       }
     } else if (
@@ -50,7 +68,8 @@ export function parseText(text) {
       value += ch;
     }
   }
-  if (quoted) throw new Error("Unclosed quote in TSV field.");
+  if (quoted)
+    throw new ParseError("unclosed-quote", "Unclosed quote in TSV field.");
   if (!endedRow) {
     endCell();
     rows.push(row);
@@ -58,29 +77,33 @@ export function parseText(text) {
   return { rows, merges: [] };
 }
 
-function* walk(root, skip) {
+function* walk(
+  root: Tree.Node,
+  skip?: (node: Tree.Node) => boolean,
+): Generator<Tree.Node> {
   const stack = [root];
   while (stack.length) {
-    const node = stack.pop();
+    const node = stack.pop()!;
     if (skip?.(node)) continue;
     yield node;
-    const children = node.childNodes ?? [];
+    const children = "childNodes" in node ? node.childNodes : [];
     for (let i = children.length - 1; i >= 0; i--) stack.push(children[i]);
   }
 }
 
-function cellText(cell) {
+function cellText(cell: Tree.Element) {
   let value = "";
-  for (const n of walk(cell, (n) =>
-    ["script", "style", "table"].includes(n.tagName),
+  for (const n of walk(
+    cell,
+    (n) => "tagName" in n && ["script", "style", "table"].includes(n.tagName),
   )) {
-    if (n.nodeName === "#text") value += n.value;
-    if (n.tagName === "br") value += "\n";
+    if ("value" in n && n.nodeName === "#text") value += n.value;
+    if (n.nodeName === "br") value += "\n";
   }
   return value;
 }
 
-function span(cell, name) {
+function span(cell: Tree.Element, name: string) {
   const raw = cell.attrs.find((attr) => attr.name === name)?.value;
   if (!raw || !/^\d+$/.test(raw)) return 1;
   const n = Number(raw);
@@ -88,26 +111,28 @@ function span(cell, name) {
   return Math.max(1, n);
 }
 
-export function parseHTML(html) {
+export function parseHTML(html: string): Grid {
   let table;
   for (const node of walk(parseFragment(html))) {
-    if (node.tagName === "table") {
+    if ("tagName" in node && node.tagName === "table") {
       table = node;
       break;
     }
   }
-  if (!table) throw new Error("No table found in the HTML payload.");
+  if (!table)
+    throw new ParseError("no-table", "No table found in the HTML payload.");
   const trs = [
-    ...walk(table, (n) => n !== table && n.tagName === "table"),
-  ].filter((n) => n.tagName === "tr");
+    ...walk(table, (n) => n !== table && n.nodeName === "table"),
+  ].filter((n): n is Tree.Element => "tagName" in n && n.tagName === "tr");
   if (trs.length > maxCells) tooLarge();
-  const rows = trs.map(() => []);
-  const merges = [];
+  const rows: Grid["rows"] = trs.map(() => []);
+  const merges: Grid["merges"] = [];
   let allocated = 0;
   trs.forEach((tr, r) => {
     let c = 0;
-    for (const cell of tr.childNodes.filter((n) =>
-      ["td", "th"].includes(n.tagName),
+    for (const cell of tr.childNodes.filter(
+      (n): n is Tree.Element =>
+        "tagName" in n && ["td", "th"].includes(n.tagName),
     )) {
       while (rows[r][c] !== undefined) c++;
       const width = span(cell, "colspan");
@@ -118,7 +143,10 @@ export function parseHTML(html) {
         if (allocated > maxCells) tooLarge();
         for (let x = c; x < c + width; x++) {
           if (rows[y][x] !== undefined)
-            throw new Error("Overlapping HTML table cells.");
+            throw new ParseError(
+              "overlapping-spans",
+              "Overlapping HTML table cells.",
+            );
           rows[y][x] = null;
         }
       }
@@ -129,15 +157,23 @@ export function parseHTML(html) {
     }
   });
   return {
-    rows: rows.map((row) => Array.from(row, (value) => value ?? null)),
+    rows: rows.map((row) =>
+      Array.from(row, (value) => (value === undefined ? "" : value)),
+    ),
     merges,
   };
 }
 
-export function parseFormat(format, raw) {
+export function parseFormat(format: string, raw: string): Grid {
   if (typeof raw !== "string" || raw.length > maxLength)
-    throw new Error("Preview accepts up to 1 million characters per format.");
+    throw new ParseError(
+      "payload-limit",
+      "Preview accepts up to 1 million characters per format.",
+    );
   if (format === "text/plain") return parseText(raw);
   if (format === "text/html") return parseHTML(raw);
-  throw new Error("Raw view only for this clipboard format.");
+  throw new ParseError(
+    "unsupported-format",
+    "Raw view only for this clipboard format.",
+  );
 }

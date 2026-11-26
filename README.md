@@ -1,6 +1,8 @@
 # Paste Lab
 
-A local clipboard inspector for people building spreadsheets, grids and rich-text editors. Pick a real Excel or Google Sheets fixture, inspect its clipboard formats, and click a parsed cell to see its exact string and Unicode code points.
+An in-browser clipboard inspector for people building spreadsheets, grids and rich-text editors. Pick a real Excel or Google Sheets fixture, inspect its clipboard formats, and click a parsed cell to see its exact string and Unicode code points. Pasted data stays in your browser, including on the hosted demo.
+
+[**Try the live demo →**](https://ejlu.github.io/paste-lab/)
 
 ![Paste Lab inspecting a multiline Google Sheets cell](docs/workbench.png)
 
@@ -22,6 +24,10 @@ Open the local address printed by Vite. Choose **Product codes** and switch betw
 3. Select **Save fixture**, name the capture, and fill in its source labels. Enter expected grids independently or choose **Use current parser output** and review the result.
 4. Download the JSON, place it in `fixtures/`, and run `npm test`. The test runner discovers it automatically. The fixture library includes it the next time the app builds.
 
+For a format that fails to parse, use an expectation such as `{"error":"no-table"}`. The runner checks the stable parser error code and continues to test the other formats.
+
+The grid shows whether each parsed format matches its saved expectation. Use the arrow keys to move between cells. **My latest paste** restores your capture after exploring the library.
+
 The download preserves the original captured strings, including line endings. Files are listed by type, with no binary content collected. Pasted data stays in memory. Review payloads before publishing them since spreadsheet HTML and custom formats can include local paths, formulas and document identifiers.
 
 ## The six fixtures
@@ -39,9 +45,9 @@ Each JSON includes the recreation recipe, source, captured formats and hand-auth
 
 ## Plug in your parser
 
-`parseFormat(mimeType, rawString)` in [src/parser.js](src/parser.js) returns `{ rows, merges }`. Both the UI and the tests call it. Cell values are strings, including empty strings. A covered merge position is `null`. A merge records its zero-based `row` and `column`, plus its `width` and `height`. Ragged rows retain their lengths.
+`parseFormat(mimeType, rawString)` in [src/parser.ts](src/parser.ts) returns `{ rows, merges }`. Both the UI and the tests call it. Cell values are strings, including empty strings. A covered merge position is `null`. A merge records its zero-based `row` and `column`, plus its `width` and `height`. Ragged rows retain their lengths.
 
-The TSV reader handles tabs, quoted fields, doubled quotes and CR/LF/CRLF. A final record separator closes the final row. The HTML reader uses parse5, reads the first table, decodes entities and maps `br` to LF. It preserves source text whitespace and does not apply spreadsheet CSS or infer numeric types. Zero or invalid spans default to one. Grid previews are bounded at 20,000 positions and one million UTF-16 units per format. Larger raw captures can still be inspected in excerpt and exported with manually supplied expectations.
+The TSV reader handles tabs, quoted fields, doubled quotes and CR/LF/CRLF. A quote at the start of a field opens a quoted field. Malformed quotes produce an error and preserve the raw input for inspection. A final record separator closes the final row. The HTML reader uses parse5, reads the first table, decodes entities and maps `br` to LF. It preserves source text whitespace and does not apply spreadsheet CSS or infer numeric types. Zero or invalid spans default to one. Grid previews are bounded at 20,000 positions and one million UTF-16 units per format. Larger raw captures can still be inspected in excerpt and exported with a limit-error expectation.
 
 ```sh
 npm test

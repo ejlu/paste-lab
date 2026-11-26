@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseFormat, parseText, parseHTML } from "../src/parser.js";
+import { parseFormat, parseText, parseHTML } from "../src/parser.ts";
 import {
   capturePaste,
   checkExpected,
   coordinate,
   visibleWhitespace,
-} from "../src/fixture.js";
+} from "../src/fixture.ts";
 
 test("quoted cells preserve literal delimiters, CRLF and doubled quotes", () => {
   assert.deepEqual(parseText('"A\tB"\t"two\r\n""lines"""\r\n').rows, [
@@ -53,4 +53,15 @@ test("raw strings round-trip unchanged and expectations must be explicit", () =>
   assert.throws(() => checkExpected({}, f.formats), /rows and merges/);
   assert.equal(visibleWhitespace(raw), "x␍↵\n⇥·⍽");
   assert.equal(coordinate(1, 26), "AA2");
+});
+
+test("malformed quotes give an explicit error and rowspan gaps preserve coordinates", () => {
+  assert.throws(() => parseText('"a"b'), { code: "invalid-quote" });
+  assert.deepEqual(
+    parseHTML("<table><tr><td>A<td rowspan=2>B<tr></table>").rows,
+    [
+      ["A", "B"],
+      ["", null],
+    ],
+  );
 });
