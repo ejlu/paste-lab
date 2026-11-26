@@ -9,6 +9,13 @@ updates:
       - dependency-name: "@types/node"
         versions: [">=25.0.0"]
     groups:
+      parse5-security:
+        applies-to: security-updates
+        patterns: [parse5]
+      npm-security:
+        applies-to: security-updates
+        patterns: ["*"]
+        exclude-patterns: [parse5]
       dev-patches:
         dependency-type: development
         update-types: [patch]

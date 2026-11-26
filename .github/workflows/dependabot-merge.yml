@@ -1,4 +1,4 @@
-name: Merge Dependabot dev patches
+name: Merge eligible Dependabot updates
 on:
   pull_request_target:
     branches: [main]
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      actions: read
+      actions: write  # Dispatch Check on main after a GITHUB_TOKEN merge.
       contents: write
       pull-requests: write
     steps:
@@ -25,31 +25,29 @@ jobs:
       - uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
         id: metadata
 
+      - name: Check auto-merge policy
+        id: policy
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          FILE_COUNT: ${{ github.event.pull_request.changed_files }}
+          UPDATES: ${{ steps.metadata.outputs.updated-dependencies-json }}
+        run: |
+          # pull_request_target sets GITHUB_SHA to the trusted base commit.
+          gh api -H 'Accept: application/vnd.github.raw+json' \
+            "repos/$GITHUB_REPOSITORY/contents/.github/scripts/dependabot_policy.py?ref=$GITHUB_SHA" > "$RUNNER_TEMP/policy.py"
+          result=$(gh api "repos/$GITHUB_REPOSITORY/compare/$BASE_SHA...$HEAD_SHA" --jq .files | python3 "$RUNNER_TEMP/policy.py")
+          echo "$result" >> "$GITHUB_OUTPUT"
+          echo "$result" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Merge the tested revision
-        if: steps.metadata.outputs.dependency-group == 'dev-patches'
+        if: steps.policy.outputs.eligible == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          UPDATES: ${{ steps.metadata.outputs.updated-dependencies-json }}
         run: |
-          if ! jq -e 'type == "array" and length > 0 and all(.[];
-            .packageEcosystem == "npm_and_yarn" and
-            .dependencyType == "direct:development" and
-            .updateType == "version-update:semver-patch" and
-            .dependencyName != "parse5")' <<< "$UPDATES" >/dev/null; then
-            echo "Outside the dev-patch policy; leaving for review."
-            exit 0
-          fi
-
-          files=$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/pulls/$PR/files")
-          if ! jq -e 'flatten | length > 0 and all(.[];
-            .status == "modified" and (.filename == "package.json" or .filename == "package-lock.json"))' \
-            <<< "$files" >/dev/null; then
-            echo "Files outside the root npm manifests changed; leaving for review."
-            exit 0
-          fi
-
           # The PR workflow can start after this one. Wait for its run on this SHA.
           runs="repos/$GITHUB_REPOSITORY/actions/workflows/check.yml/runs?event=pull_request&head_sha=$HEAD_SHA"
           while true; do
@@ -63,3 +61,5 @@ jobs:
 
           # Merge only this SHA under the live branch rules. A later push needs fresh CI.
           gh pr merge "$PR" --repo "$GITHUB_REPOSITORY" --squash --match-head-commit "$HEAD_SHA"
+          # A push made with GITHUB_TOKEN does not start the usual Pages workflow.
+          gh workflow run check.yml --repo "$GITHUB_REPOSITORY" --ref main
