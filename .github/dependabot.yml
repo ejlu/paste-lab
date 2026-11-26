@@ -4,6 +4,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Raise this ceiling when the workbench moves to Node 26.
+      - dependency-name: "@types/node"
+        versions: [">=25.0.0"]
     groups:
       dev-patches:
         dependency-type: development
