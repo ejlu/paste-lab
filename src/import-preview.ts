@@ -1,6 +1,7 @@
 import {
   compareClipboardFormats,
   importInventoryRow,
+  sheetsCompact,
   type CellEvidence,
 } from "./importer.ts";
 import { coordinate } from "./fixture.ts";
@@ -14,9 +15,36 @@ export function renderImportPreview(
   heading.textContent = "Inventory import preview";
   section.append(heading);
 
-  const { cells, note } = compareClipboardFormats(formats);
-  if (note) section.append(paragraph(note));
-  if (!cells.length) return;
+  const comparison = compareClipboardFormats(formats);
+  const { cells, alignment } = comparison;
+  const messages = {
+    missing: "was not supplied",
+    empty: "is empty",
+    "no-table": "contains no table",
+    malformed: "could not be parsed",
+    "limit-exceeded": "exceeds the preview limit",
+    "unsupported-layout": "has an unsupported layout",
+    unaligned: "could not be aligned to a display grid",
+  };
+  for (const type of ["text/plain", "text/html", sheetsCompact] as const) {
+    const status = comparison.formats[type];
+    if (status !== "available")
+      section.append(
+        paragraph(
+          `${type === sheetsCompact ? "Sheets stored-value data" : type} ${messages[status]}.`,
+        ),
+      );
+  }
+  if (!cells.length) {
+    const reasons = {
+      "no-display": "No tabular display data.",
+      "shape-mismatch": "The displayed grids have different dimensions.",
+      "merged-cells": "The importer requires unmerged cells.",
+      aligned: "No cells available.",
+    };
+    section.append(paragraph(reasons[alignment]));
+    return;
+  }
   const start = cells.length > 1 ? 1 : 0;
   const rowField = document.createElement("input");
   rowField.type = "number";
@@ -72,6 +100,7 @@ export function renderImportPreview(
   function update() {
     evidence.replaceChildren();
     if (idField.disabled) {
+      result.dataset.state = "review";
       result.textContent = "Choose a data row in range.";
       return;
     }
@@ -100,15 +129,17 @@ export function renderImportPreview(
         coordinate(r, c),
         literal(cell.plain),
         literal(cell.html),
-        literal(cell.stored),
+        cell.storedBlank ? "Blank" : literal(cell.stored),
         finding(cell),
       ])
         tr.insertCell().textContent = value;
     }
     evidence.append(table);
     const imported = importInventoryRow(
-      row[idField.selectedIndex],
-      row[qtyField.selectedIndex],
+      comparison,
+      r,
+      idField.selectedIndex,
+      qtyField.selectedIndex,
     );
     result.dataset.state = imported.status;
     result.textContent =
@@ -127,11 +158,13 @@ function literal(v: string | number | null) {
 function finding(cell: CellEvidence) {
   const names = {
     "display-text": "Plain text and HTML differ",
+    "stored-blank": "Stored cell is blank but display contains text",
     "stored-text": "Stored text differs from display",
-    "formatted-number": "Number displayed with formatting",
+    "stored-number": "Display differs from stored number",
   };
   if (cell.differences.length)
     return cell.differences.map((d) => names[d]).join(" · ");
+  if (cell.storedBlank) return "Blank cell";
   return cell.stored === null ? "Display evidence only" : "Values agree";
 }
 function paragraph(text: string) {

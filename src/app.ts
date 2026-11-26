@@ -128,10 +128,7 @@ function openFixture(f: Fixture) {
     ? "text/plain"
     : Object.keys(f.formats)[0];
   renderFormat();
-  ui.importer.hidden =
-    f !== recent &&
-    !["sheets-product-codes", "excel-product-codes"].includes(f.id);
-  if (!ui.importer.hidden) renderImportPreview(ui.importer, f.formats);
+  renderImportPreview(ui.importer, f.formats);
 }
 
 function renderRaw() {

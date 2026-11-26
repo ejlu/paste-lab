@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "id": "sheets-mixed-blanks",
+  "title": "Leading and consecutive blanks",
+  "recipe": "In A1:D6, enter the rows shown in the expected grid. Leave A1, C3, B4, C4 and A5 empty. Enter 11, 0 and 43 as numbers in C2, C5 and C6. Copy A1:D6. Map column B to Product ID and C to Quantity.",
+  "source": {
+    "app": "Google Sheets",
+    "os": "macOS 26.6.1",
+    "browser": "Chrome 158.0.8127.37",
+    "method": "Browser paste event",
+    "edits": "Omitted the clipboard ID and wrapped document payload. Retained formats are unchanged."
+  },
+  "types": [
+    "text/plain",
+    "text/html",
+    "application/x-vnd.google-spreadsheet-compact-table+json",
+    "application/x-vnd.google-docs-embedded-grid_range_clip+wrapped",
+    "application/x-vnd.google-docs-internal-clip-id"
+  ],
+  "formats": {
+    "text/plain": "\tItem\tCount\tBin\nlot-A\tSKU-A\t11\tbin-A\nlot-B\tSKU-B\t\tbin-B\nlot-C\t\t\tbin-C\n\tSKU-Z\t0\tbin-Z\nlot-D\tSKU-D\t43\tbin-D",
+    "text/html": "<google-sheets-html-origin><style type=\"text/css\"><!--td {border: 1px solid #cccccc;overflow: hidden;padding: 2px 3px 2px 3px;vertical-align: bottom;}br {mso-data-placement:same-cell;}--></style><table xmlns=\"http://www.w3.org/1999/xhtml\" cellspacing=\"0\" cellpadding=\"0\" dir=\"ltr\" border=\"1\" style=\"table-layout:fixed;font-size:10pt;font-family:Arial;width:0px;border-collapse:collapse;border:none\" data-sheets-root=\"1\" data-sheets-baot=\"1\"><colgroup><col width=\"100\"/><col width=\"100\"/><col width=\"100\"/><col width=\"100\"/></colgroup><tbody><tr><td></td><td>Item</td><td>Count</td><td>Bin</td></tr><tr><td>lot-A</td><td>SKU-A</td><td style=\"text-align:right;\">11</td><td>bin-A</td></tr><tr><td>lot-B</td><td>SKU-B</td><td></td><td>bin-B</td></tr><tr><td>lot-C</td><td></td><td></td><td>bin-C</td></tr><tr><td></td><td>SKU-Z</td><td style=\"text-align:right;\">0</td><td>bin-Z</td></tr><tr><td>lot-D</td><td>SKU-D</td><td style=\"text-align:right;\">43</td><td>bin-D</td></tr></tbody></table>",
+    "application/x-vnd.google-spreadsheet-compact-table+json": "{\"1\":1,\"2\":[194,-9,195,194,-2,195,-2,194,195,194,-7,195],\"3\":{\"1\":[2,2,2,2,2,1,2,2,2,2,2,2,2,1,2,2,2,1,2],\"3\":[11,0,43],\"4\":[\"Item\",\"Count\",\"Bin\",\"lot-A\",\"SKU-A\",\"bin-A\",\"lot-B\",\"SKU-B\",\"bin-B\",\"lot-C\",\"bin-C\",\"SKU-Z\",\"bin-Z\",\"lot-D\",\"SKU-D\",\"bin-D\"]},\"4\":[{\"2\":4224,\"10\":2,\"15\":\"Arial\"},{\"2\":4288,\"9\":2,\"10\":2,\"15\":\"Arial\"}],\"5\":[-6,0,1,-11,0,1,-3,0,1,0],\"12\":[-24,1],\"13\":[-24,1],\"15\":{\"1\":6,\"2\":4},\"20\":24}"
+  },
+  "expected": {
+    "text/plain": {
+      "rows": [
+        [
+          "",
+          "Item",
+          "Count",
+          "Bin"
+        ],
+        [
+          "lot-A",
+          "SKU-A",
+          "11",
+          "bin-A"
+        ],
+        [
+          "lot-B",
+          "SKU-B",
+          "",
+          "bin-B"
+        ],
+        [
+          "lot-C",
+          "",
+          "",
+          "bin-C"
+        ],
+        [
+          "",
+          "SKU-Z",
+          "0",
+          "bin-Z"
+        ],
+        [
+          "lot-D",
+          "SKU-D",
+          "43",
+          "bin-D"
+        ]
+      ],
+      "merges": []
+    },
+    "text/html": {
+      "rows": [
+        [
+          "",
+          "Item",
+          "Count",
+          "Bin"
+        ],
+        [
+          "lot-A",
+          "SKU-A",
+          "11",
+          "bin-A"
+        ],
+        [
+          "lot-B",
+          "SKU-B",
+          "",
+          "bin-B"
+        ],
+        [
+          "lot-C",
+          "",
+          "",
+          "bin-C"
+        ],
+        [
+          "",
+          "SKU-Z",
+          "0",
+          "bin-Z"
+        ],
+        [
+          "lot-D",
+          "SKU-D",
+          "43",
+          "bin-D"
+        ]
+      ],
+      "merges": []
+    }
+  }
+}

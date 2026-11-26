@@ -1,0 +1,26 @@
+{
+  "name": "paste-lab",
+  "version": "0.1.0-rc.1",
+  "description": "Compare displayed spreadsheet clipboard text with available stored cell values.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ejlu/paste-lab.git",
+    "directory": "packages/paste-lab"
+  },
+  "homepage": "https://ejlu.github.io/paste-lab/",
+  "type": "module",
+  "types": "./lib/compare.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/compare.d.ts",
+      "import": "./lib/compare.js"
+    }
+  },
+  "files": ["lib/compare.js", "lib/compare.d.ts", "lib/parser.js", "LICENSE"],
+  "scripts": {
+    "prepack": "npm --prefix ../.. run build:lib"
+  },
+  "engines": { "node": ">=22.12.0" },
+  "dependencies": { "parse5": "8.1.1" }
+}

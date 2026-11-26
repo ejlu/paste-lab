@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "id": "sheets-blank-count",
+  "title": "One blank count",
+  "recipe": "Enter Item and Count in A1:B1, then SKU-A with 7 twice, SKU-Z with 0, and SKU-B with an empty B5. Copy A1:B5.",
+  "source": {
+    "app": "Google Sheets",
+    "os": "macOS 26.6.1",
+    "browser": "Chrome 158.0.8127.37",
+    "method": "Browser paste event",
+    "edits": "Omitted the clipboard ID and wrapped document payload. Retained formats are unchanged."
+  },
+  "types": [
+    "text/plain",
+    "text/html",
+    "application/x-vnd.google-spreadsheet-compact-table+json",
+    "application/x-vnd.google-docs-embedded-grid_range_clip+wrapped",
+    "application/x-vnd.google-docs-internal-clip-id"
+  ],
+  "formats": {
+    "text/plain": "Item\tCount\nSKU-A\t7\nSKU-A\t7\nSKU-Z\t0\nSKU-B\t",
+    "text/html": "<google-sheets-html-origin><style type=\"text/css\"><!--td {border: 1px solid #cccccc;overflow: hidden;padding: 2px 3px 2px 3px;vertical-align: bottom;}br {mso-data-placement:same-cell;}--></style><table xmlns=\"http://www.w3.org/1999/xhtml\" cellspacing=\"0\" cellpadding=\"0\" dir=\"ltr\" border=\"1\" style=\"table-layout:fixed;font-size:10pt;font-family:Arial;width:0px;border-collapse:collapse;border:none\" data-sheets-root=\"1\" data-sheets-baot=\"1\"><colgroup><col width=\"100\"/><col width=\"100\"/></colgroup><tbody><tr><td>Item</td><td>Count</td></tr><tr><td>SKU-A</td><td style=\"text-align:right;\">7</td></tr><tr><td>SKU-A</td><td style=\"text-align:right;\">7</td></tr><tr><td>SKU-Z</td><td style=\"text-align:right;\">0</td></tr><tr><td>SKU-B</td><td></td></tr></tbody></table>",
+    "application/x-vnd.google-spreadsheet-compact-table+json": "{\"1\":1,\"2\":[-9,195,194],\"3\":{\"1\":[2,2,2,1,2,1,2,1,2],\"3\":[7,7,0],\"4\":[\"Item\",\"Count\",\"SKU-A\",\"SKU-A\",\"SKU-Z\",\"SKU-B\"]},\"4\":[{\"2\":4224,\"10\":2,\"15\":\"Arial\"},{\"2\":4288,\"9\":2,\"10\":2,\"15\":\"Arial\"}],\"5\":[-3,0,1,0,1,0,1,-2,0],\"12\":[-10,1],\"13\":[-10,1],\"15\":{\"1\":5,\"2\":2},\"20\":10}"
+  },
+  "expected": {
+    "text/plain": {
+      "rows": [
+        [
+          "Item",
+          "Count"
+        ],
+        [
+          "SKU-A",
+          "7"
+        ],
+        [
+          "SKU-A",
+          "7"
+        ],
+        [
+          "SKU-Z",
+          "0"
+        ],
+        [
+          "SKU-B",
+          ""
+        ]
+      ],
+      "merges": []
+    },
+    "text/html": {
+      "rows": [
+        [
+          "Item",
+          "Count"
+        ],
+        [
+          "SKU-A",
+          "7"
+        ],
+        [
+          "SKU-A",
+          "7"
+        ],
+        [
+          "SKU-Z",
+          "0"
+        ],
+        [
+          "SKU-B",
+          ""
+        ]
+      ],
+      "merges": []
+    }
+  }
+}

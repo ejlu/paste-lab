@@ -65,3 +65,11 @@ test("malformed quotes give an explicit error and rowspan gaps preserve coordina
     ],
   );
 });
+
+test("only a lone marked Sheets span represents a single HTML cell", () => {
+  const marked = '<span data-sheets-root="1">7</span>';
+  assert.deepEqual(parseHTML(" " + marked + "\n").rows, [["7"]]);
+  for (const html of ["<span>7</span>", marked + marked, "other" + marked]) {
+    assert.throws(() => parseHTML(html), { code: "no-table" });
+  }
+});
