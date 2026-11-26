@@ -4,7 +4,11 @@ Compare the representations of a spreadsheet paste before importing its cells. A
 
 ## Use the release candidate
 
-Install the candidate with `npm install ./paste-lab-0.1.0-rc.2.tgz`. The package exports ES modules and TypeScript declarations. It takes a map of MIME types to their original strings. In a browser, collect only the types actually present on the paste event.
+```sh
+npm install paste-lab@next
+```
+
+The package exports ES modules and TypeScript declarations. It takes a map of MIME types to their original strings. In a browser, collect only the types actually present on the paste event.
 
 ```ts
 import { compareClipboardFormats, sheetsCompact } from "paste-lab";

@@ -8,7 +8,15 @@ An in-browser clipboard inspector for people building spreadsheets, grids and ri
 
 ## TypeScript release candidate
 
-The local `paste-lab` package exports `compareClipboardFormats`. From the repository root, run `npm ci`, then `npm run pack:lib` and `npm run test:package -- ./paste-lab-0.1.0-rc.2.tgz`. The consumer test installs that archive in a fresh directory, compiles with strict NodeNext settings, and runs the fixture checks against the installed entry point. [Package API and example](packages/paste-lab/README.md)
+Install the published candidate in your project.
+
+```sh
+npm install paste-lab@next
+```
+
+Use `compareClipboardFormats` to inspect displayed strings and available stored values before importing a paste. [Package API and example](packages/paste-lab/README.md)
+
+To test a locally built tarball, start from the repository root and run `npm ci`, then `npm run pack:lib` and `npm run test:package -- ./paste-lab-0.1.0-rc.2.tgz`. The consumer test installs that archive in a fresh directory, compiles with strict NodeNext settings, and runs the fixture checks against the installed entry point.
 
 ## Run locally
 
