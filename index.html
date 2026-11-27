@@ -11,6 +11,7 @@
     <header>
       <span class="mark" aria-hidden="true">▦</span><strong>Paste Lab</strong
       ><span class="divider">/</span><span>Clipboard inspector</span>
+      <a class="inventory-link" href="#importer">Inventory examples ↓</a>
     </header>
     <main>
       <aside aria-label="Captures">
@@ -37,6 +38,15 @@
           <button id="save" class="primary">Save fixture ↓</button>
         </div>
         <p id="recipe"></p>
+        <section id="importer" aria-labelledby="inventory-title">
+          <h2 id="inventory-title">Inventory import preview</h2>
+          <div class="examples" role="group" aria-label="Try a Google Sheets example">
+            <button type="button" data-example="sheets-product-codes">Product ID · 00123</button>
+            <button type="button" data-example="sheets-rounded-quantity">Rounded quantity · 7.4</button>
+            <button type="button" data-example="sheets-single-number">Whole quantity · 7</button>
+          </div>
+          <div id="inventory-result"></div>
+        </section>
         <section class="panel" aria-label="Clipboard and grid">
           <div class="payload">
             <div class="panelhead">
@@ -69,10 +79,6 @@
             </div>
           </div>
         </section>
-        <section
-          id="importer"
-          aria-label="Inventory import preview"
-        ></section>
         <details id="provenance">
           <summary>Capture details</summary>
           <p id="details"></p>

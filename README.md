@@ -4,6 +4,8 @@ An in-browser clipboard inspector for people building spreadsheets, grids and ri
 
 [**Try the live demo →**](https://ejlu.github.io/paste-lab/)
 
+In the inventory preview, try the [leading-zero product ID](https://ejlu.github.io/paste-lab/?fixture=sheets-product-codes#importer), then compare the [rounded quantity](https://ejlu.github.io/paste-lab/?fixture=sheets-rounded-quantity#importer) with a [literal 7](https://ejlu.github.io/paste-lab/?fixture=sheets-single-number#importer). Both quantities display as `7`. The preview holds the stored `7.4` for review and accepts the stored `7`.
+
 ![Paste Lab inspecting a multiline Google Sheets cell](docs/workbench.png)
 
 ## TypeScript package
@@ -98,7 +100,7 @@ For the browser checks, run `npx playwright install chromium` followed by `npm r
 
 ## Product IDs and quantities
 
-Open **Product codes → Google Sheets** in the fixture library and scroll to **Inventory import preview**. Row 2 displays `00123` in both columns. With A mapped to Product ID and B to Quantity, the importer emits `{"productId":"00123","quantity":123}`. Map B to both fields to see the same cell imported two ways. Map A to Quantity to see a text-only quantity sent for review.
+Choose **Product ID · 00123** in **Inventory import preview**. Row 2 displays `00123` in both columns. With A mapped to Product ID and B to Quantity, the importer emits `{"productId":"00123","quantity":123}`. Map B to both fields to see the same cell imported two ways. Map A to Quantity to see a text-only quantity sent for review.
 
 [compareClipboardFormats](src/importer.ts) compares plain text, HTML table text and typed values by cell position. The Sheets captures show a single numeric cell, runs of populated cells, and leading, interior, consecutive and trailing blanks. Explicit blanks have `stored: null` and `storedBlank: true`. A blank consumes a grid position without consuming a typed value. This is an undocumented format. Unsupported layouts and missing metadata leave the stored value unavailable. The comparison returns per-cell evidence, a status for each format in `formats`, and an `alignment` result. A malformed TSV leaves the HTML grid available for inspection. Merged or differently shaped display grids cannot be mapped safely and produce no aligned cells.
 
