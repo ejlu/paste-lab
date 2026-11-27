@@ -108,3 +108,30 @@ test("one copied Sheets cell can supply both inventory fields", async ({
     /"productId": "7",\s*"quantity": 7/,
   );
 });
+
+test("try the inventory examples from the landing page", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("./");
+  await page.getByRole("link", { name: "Inventory examples" }).click();
+  const preview = page.getByRole("region", { name: "Inventory import preview" });
+  const result = preview.getByLabel("Import result");
+  const product = preview.getByRole("button", { name: "Product ID · 00123" });
+  const rounded = preview.getByRole("button", { name: "Rounded quantity · 7.4" });
+  const whole = preview.getByRole("button", { name: "Whole quantity · 7" });
+
+  await expect(product).toBeInViewport();
+  await expect(product).toHaveAttribute("aria-pressed", "true");
+  await expect(result).toContainText('"productId": "00123"');
+  await rounded.click();
+  await expect(result).toHaveAttribute("data-state", "review");
+  await expect(result).toContainText('displays "7" and stores 7.4');
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Rounded inventory quantity");
+  await whole.click();
+  await expect(result).toHaveAttribute("data-state", "ready");
+  await expect(result).toContainText('"quantity": 7');
+  await product.click();
+  await preview.getByLabel("Product ID column").selectOption("1");
+  await expect(result).toContainText('"productId": "00123"');
+  await expect(result).toContainText('"quantity": 123');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+});

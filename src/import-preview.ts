@@ -1,9 +1,10 @@
 import {
   compareClipboardFormats,
-  importInventoryRow,
   sheetsCompact,
   type CellEvidence,
-} from "./importer.ts";
+} from "./compare.ts";
+import { previewInventoryPaste } from "./inventory.ts";
+import { issueMessages } from "./column-preview.ts";
 import { coordinate } from "./fixture.ts";
 
 export function renderImportPreview(
@@ -11,9 +12,6 @@ export function renderImportPreview(
   formats: Readonly<Record<string, string>>,
 ) {
   section.replaceChildren();
-  const heading = document.createElement("h2");
-  heading.textContent = "Inventory import preview";
-  section.append(heading);
 
   const comparison = compareClipboardFormats(formats);
   const { cells, alignment } = comparison;
@@ -72,7 +70,7 @@ export function renderImportPreview(
   evidence.className = "import-evidence";
   const result = document.createElement("output");
   result.setAttribute("aria-label", "Import result");
-  section.append(evidence, result);
+  section.append(result, evidence);
   function refreshColumns() {
     const row = cells[rowField.valueAsNumber - 1];
     const valid = rowField.validity.valid && row?.length;
@@ -135,17 +133,42 @@ export function renderImportPreview(
         tr.insertCell().textContent = value;
     }
     evidence.append(table);
-    const imported = importInventoryRow(
-      comparison,
-      r,
-      idField.selectedIndex,
-      qtyField.selectedIndex,
-    );
+    const preview = previewInventoryPaste(comparison, {
+      columns: {
+        productId: idField.selectedIndex,
+        quantity: qtyField.selectedIndex,
+      },
+      headerRows: start,
+    });
+    if (preview.status === "blocked") {
+      result.dataset.state = "review";
+      result.textContent = preview.reason === "invalid-display"
+        ? preview.problems.map(({ format, status }) =>
+            `Review the ${format} representation (${status}).`).join("\n")
+        : "Cannot preview this paste: " + preview.reason;
+      return;
+    }
+    const imported = preview.rows[r - start];
     result.dataset.state = imported.status;
-    result.textContent =
-      imported.status === "ready"
-        ? JSON.stringify(imported.record, null, 2)
-        : "Review required\n" + imported.issues.join("\n");
+    if (imported.status === "ready") {
+      const decision = /^0[0-9]/.test(imported.values.productId)
+        ? "Ready to import · Product ID keeps its leading zeros"
+        : "Ready to import";
+      result.textContent = decision + "\n" + JSON.stringify(imported.values, null, 2);
+      return;
+    }
+    const reasons = imported.issues.map(({ code, evidence }) => {
+      if (
+        code === "invalid-quantity" &&
+        typeof evidence?.stored === "number" &&
+        !Number.isInteger(evidence.stored)
+      ) {
+        const displayed = evidence.plain ?? evidence.html;
+        return `The cell displays ${literal(displayed)} and stores ${evidence.stored}. This quantity must be a whole number.`;
+      }
+      return issueMessages[code];
+    });
+    result.textContent = "Review required\n" + reasons.join("\n");
   }
   rowField.oninput = refreshColumns;
   idField.onchange = qtyField.onchange = update;

@@ -16,8 +16,8 @@ const files = import.meta.glob<unknown>("../fixtures/*.json", {
   import: "default",
 });
 const order = [
-  "excel-product-codes",
   "sheets-product-codes",
+  "excel-product-codes",
   "sheets-multiline-cell",
   "excel-empty-edges",
   "sheets-merged-header",
@@ -41,6 +41,7 @@ function element<K extends keyof HTMLElementTagNameMap>(tag: K, id: string) {
 
 const ui = {
   importer: element("section", "importer"),
+  inventoryResult: element("div", "inventory-result"),
   match: element("span", "match"),
   inspector: element("div", "inspector"),
   displayTitle: element("input", "display-title"),
@@ -102,6 +103,16 @@ for (const f of fixtures) {
   ui.library.append(button);
 }
 
+const examples = ui.importer.querySelectorAll<HTMLButtonElement>("button[data-example]");
+for (const button of examples) {
+  const fixture = fixtures.find((f) => f.id === button.dataset.example);
+  if (!fixture) throw new Error("Missing inventory example: " + button.dataset.example);
+  button.onclick = () => {
+    openFixture(fixture);
+    ui.importer.scrollIntoView({ block: "start" });
+  };
+}
+
 function openFixture(f: Fixture) {
   active = f;
   ui.title.textContent = f.title;
@@ -132,7 +143,10 @@ function openFixture(f: Fixture) {
     ? "text/plain"
     : Object.keys(f.formats)[0];
   renderFormat();
-  renderImportPreview(ui.importer, f.formats);
+  for (const button of examples) {
+    button.setAttribute("aria-pressed", String(button.dataset.example === f.id));
+  }
+  renderImportPreview(ui.inventoryResult, f.formats);
 }
 
 function renderRaw() {

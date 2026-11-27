@@ -516,6 +516,7 @@ td.different {
   max-width: min(220px, 100%);
 }
 .import-evidence {
+  margin-top: 14px;
   overflow-x: auto;
 }
 .import-evidence table {
@@ -535,4 +536,28 @@ td.different {
 }
 #importer output[data-state="review"] {
   background: #fff0d2;
+}
+
+.inventory-link {
+  margin-left: auto;
+  color: var(--blue);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+#importer {
+  scroll-margin-top: 12px;
+}
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 14px 0;
+}
+.examples button {
+  font-size: 14px;
+}
+.examples button[aria-pressed="true"] {
+  color: #233a84;
+  border-color: #bac5e8;
+  background: #e4e8f6;
 }
