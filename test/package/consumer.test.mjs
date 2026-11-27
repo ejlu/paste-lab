@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import * as api from "paste-lab";
+import * as inventory from "paste-lab/inventory";
 import { inspectQuantity } from "./consumer.js";
 
 const files = readdirSync("fixtures").filter(name => name.endsWith(".json"));
@@ -100,4 +101,20 @@ test("trailing LF keeps the confirmed blank at its original coordinate", () => {
   assert.deepEqual(compactOnly.cells[1][0], { plain: "", html: null, stored: null, storedBlank: true, differences: [] });
   const displays = api.compareClipboardFormats({ ...tsv, "text/html": formats["text/html"] });
   assert.deepEqual(displays.cells[1][0], { plain: "", html: "", stored: null, differences: [] });
+});
+
+test("the inventory subpath holds rounded quantities and accepts literal integers", () => {
+  assert.deepEqual(Object.keys(inventory), ["previewInventoryPaste"]);
+  const preview = id => inventory.previewInventoryPaste(compare(id), {columns:{quantity:0},headerRows:0});
+  const held = preview("sheets-rounded-number").rows[0];
+  assert.equal(held.status, "review");
+  assert.equal(held.issues[0].evidence.stored, 7.4);
+  assert.equal(held.issues[0].evidence.plain, "7");
+  const ready = preview("sheets-single-number").rows[0];
+  assert.equal(ready.status, "ready");
+  assert.deepEqual(ready.values, {quantity:7});
+  const ids = inventory.previewInventoryPaste(compare("sheets-product-codes"), {
+    columns: {productId:0, quantity:1}, headerRows:1
+  });
+  assert.deepEqual(ids.rows[0].values, {productId:"00123",quantity:123});
 });

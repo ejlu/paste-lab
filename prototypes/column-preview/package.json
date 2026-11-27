@@ -1,0 +1,13 @@
+{
+  "name": "paste-lab-column-preview-trial",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node trial.mjs"
+  },
+  "devDependencies": {
+    "gridclip": "1.0.0",
+    "jspreadsheet-ce": "4.15.0",
+    "tabulator-tables": "6.7.1"
+  }
+}
