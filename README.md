@@ -20,7 +20,7 @@ In a Chromium trial with Tabulator’s range-paste importer, the [rounded invent
 
 For inventory imports, `paste-lab/inventory` previews product IDs and whole-unit quantities. The live Google Sheets keyboard trial in Tabulator and Jspreadsheet CE held a rounded `7.4` and accepted a literal `7`, even though both pasted as the text `7`. [Inventory API and example](packages/paste-lab/README.md#inventory-preview)
 
-To test a locally built tarball, start from the repository root and run `npm ci`, then `npm run pack:lib` and `npm run test:package -- ./paste-lab-0.2.0.tgz`. The consumer test installs that archive in a fresh directory, compiles with strict NodeNext settings, and runs the fixture checks against the installed entry point.
+To test a locally built tarball, start from the repository root and run `npm ci`, then `npm run pack:lib` and `npm run test:package -- ./paste-lab-0.2.1.tgz`. The consumer test installs that archive in a fresh directory, compiles with strict NodeNext settings, and runs the fixture checks against the installed entry point.
 
 ## Run locally
 
