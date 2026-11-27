@@ -2,7 +2,7 @@
 
 An in-browser clipboard inspector for people building spreadsheets, grids and rich-text editors. Pick a real Excel or Google Sheets fixture, inspect its clipboard formats, and click a parsed cell to see its exact string and Unicode code points. Pasted data stays in your browser, including on the hosted demo.
 
-[**Try the live demo →**](https://ejlu.github.io/paste-lab/)
+[**Try the live demo →**](https://ejlu.github.io/paste-lab/) · [**View on npm**](https://www.npmjs.com/package/paste-lab)
 
 In the inventory preview, try the [leading-zero product ID](https://ejlu.github.io/paste-lab/?fixture=sheets-product-codes#importer), then compare the [rounded quantity](https://ejlu.github.io/paste-lab/?fixture=sheets-rounded-quantity#importer) with a [literal 7](https://ejlu.github.io/paste-lab/?fixture=sheets-single-number#importer). Both quantities display as `7`. The preview holds the stored `7.4` for review and accepts the stored `7`.
 
