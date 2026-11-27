@@ -6,17 +6,17 @@ An in-browser clipboard inspector for people building spreadsheets, grids and ri
 
 ![Paste Lab inspecting a multiline Google Sheets cell](docs/workbench.png)
 
-## TypeScript release candidate
-
-Install the published candidate in your project.
+## TypeScript package
 
 ```sh
-npm install paste-lab@next
+npm install paste-lab
 ```
 
 Use `compareClipboardFormats` to inspect displayed strings and available stored values before importing a paste. [Package API and example](packages/paste-lab/README.md)
 
-To test a locally built tarball, start from the repository root and run `npm ci`, then `npm run pack:lib` and `npm run test:package -- ./paste-lab-0.1.0-rc.2.tgz`. The consumer test installs that archive in a fresh directory, compiles with strict NodeNext settings, and runs the fixture checks against the installed entry point.
+In a Chromium trial with Tabulator’s range-paste importer, the [rounded inventory capture](fixtures/sheets-rounded-quantity.json) pasted as `SKU-R / 7`. With the helper, a whole-unit quantity check saw the stored `7.4` and held the row for review. A [literal seven](fixtures/sheets-single-number.json) passed the same check.
+
+To test a locally built tarball, start from the repository root and run `npm ci`, then `npm run pack:lib` and `npm run test:package -- ./paste-lab-0.1.0.tgz`. The consumer test installs that archive in a fresh directory, compiles with strict NodeNext settings, and runs the fixture checks against the installed entry point.
 
 ## Run locally
 
