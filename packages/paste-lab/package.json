@@ -1,7 +1,8 @@
 {
   "name": "paste-lab",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Compare displayed spreadsheet clipboard text with available stored cell values.",
+  "keywords": ["clipboard", "paste", "spreadsheet", "google-sheets", "excel", "tsv", "data-import"],
   "license": "MIT",
   "repository": {
     "type": "git",
