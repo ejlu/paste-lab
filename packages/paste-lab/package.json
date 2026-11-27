@@ -1,6 +1,6 @@
 {
   "name": "paste-lab",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0",
   "description": "Compare displayed spreadsheet clipboard text with available stored cell values.",
   "license": "MIT",
   "repository": {

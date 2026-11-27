@@ -2,10 +2,10 @@
 
 Compare the representations of a spreadsheet paste before importing its cells. A Google Sheets cell containing `7.4` can display and paste as `7` in both text and HTML. When Sheets also supplies supported compact-table data, this helper reports the displayed strings and the stored number at the same coordinate.
 
-## Use the release candidate
+## Install
 
 ```sh
-npm install paste-lab@next
+npm install paste-lab
 ```
 
 The package exports ES modules and TypeScript declarations. It takes a map of MIME types to their original strings. In a browser, collect only the types actually present on the paste event.
