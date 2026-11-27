@@ -1,7 +1,7 @@
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import { parseClipboard, applyPaste } from "gridclip";
 import { compareClipboardFormats } from "../../src/compare.ts";
-import { previewInventoryPaste } from "./index.ts";
+import { previewInventoryPaste } from "../../src/inventory.ts";
 
 export function previewEvent(event, mapping) {
   const data = event.clipboardData;

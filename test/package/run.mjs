@@ -15,12 +15,12 @@ try {
   writeFileSync(join(cwd, "package.json"), JSON.stringify({ private: true, type: "module" }));
   writeFileSync(join(cwd, "tsconfig.json"), JSON.stringify({
     compilerOptions: {
-      module: "NodeNext", target: "ES2022", strict: true, skipLibCheck: false,
+      module: "NodeNext", target: "ES2022", strict: true, exactOptionalPropertyTypes: true, skipLibCheck: false,
       types: [], lib: ["ES2022"],
     },
-    files: ["consumer.ts"],
+    files: ["consumer.ts", "inventory-consumer.ts"],
   }));
-  for (const name of ["consumer.ts", "consumer.test.mjs"]) cpSync(join(source, name), join(cwd, name));
+  for (const name of ["consumer.ts", "inventory-consumer.ts", "consumer.test.mjs"]) cpSync(join(source, name), join(cwd, name));
   cpSync(join(root, "fixtures"), join(cwd, "fixtures"), { recursive: true });
   const options = { cwd, stdio: "inherit" };
   console.log("Testing", tarball, "with", process.version, "in", cwd);

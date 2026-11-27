@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node check-types.mjs && node trial.mjs"
+    "test": "node trial.mjs"
   },
   "devDependencies": {
     "gridclip": "1.0.0",

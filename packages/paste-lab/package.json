@@ -1,6 +1,6 @@
 {
   "name": "paste-lab",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Compare displayed spreadsheet clipboard text with available stored cell values.",
   "license": "MIT",
   "repository": {
@@ -15,9 +15,13 @@
     ".": {
       "types": "./lib/compare.d.ts",
       "import": "./lib/compare.js"
+    },
+    "./inventory": {
+      "types": "./lib/inventory.d.ts",
+      "import": "./lib/inventory.js"
     }
   },
-  "files": ["lib/compare.js", "lib/compare.d.ts", "lib/parser.js", "LICENSE"],
+  "files": ["lib/compare.js", "lib/compare.d.ts", "lib/parser.js", "lib/inventory.js", "lib/inventory.d.ts", "lib/column-preview.js", "lib/column-preview.d.ts", "LICENSE"],
   "scripts": {
     "prepack": "npm --prefix ../.. run build:lib"
   },

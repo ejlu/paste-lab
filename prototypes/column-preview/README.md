@@ -1,6 +1,6 @@
 # Column-aware paste preview
 
-A local API experiment for two inventory fields. The proposed entry point is `prototypes/column-preview/index.ts`.
+Importer trials for the `paste-lab/inventory` entry point shipped in 0.2.0.
 
 ```ts
 const comparison = compareClipboardFormats(formats);
@@ -14,11 +14,11 @@ Map either or both fields. Source columns and reported rows are zero-based offse
 
 A blocked paste has a batch reason. A preview has ordered rows. A ready row has typed values and the supporting cell evidence for exactly its mapped fields. A display-only ID has a null stored value. Both blocked and successful previews include the per-format statuses. A review row has issues with the field, source column, reason code and cell evidence. For the rounded inventory capture, the issue at B1 includes displayed strings `"7"` and stored number `7.4`. The caller decides which ready rows to commit and how to present held rows.
 
-Product IDs retain the displayed spelling and can use display-only evidence. Quantities require a stored nonnegative safe integer and matching displayed digits; leading zero padding is accepted. The available Excel captures have no stored number. A missing display can be tolerated when another display supplies evidence; malformed, over-limit or empty display formats block the batch. The existing workbench row importer and the prototype share these rules.
+Product IDs retain the displayed spelling and can use display-only evidence. Quantities require a stored nonnegative safe integer and matching displayed digits; leading zero padding is accepted. The available Excel captures have no stored number. A missing display can be tolerated when another display supplies evidence; malformed, over-limit or empty display formats block the batch. The existing workbench row importer and the package share these rules.
 
 ## Run the importer trials
 
-From the repo root, run `npm ci`, `npm ci --prefix prototypes/column-preview`, `npx playwright install chromium`, and `npm test --prefix prototypes/column-preview`. The script first compiles a strict NodeNext consumer against the emitted prototype declarations. The browser trial replays saved clipboard formats through DOM paste events in Chromium.
+From the repo root, run `npm ci`, `npm ci --prefix prototypes/column-preview`, `npx playwright install chromium`, and `npm test --prefix prototypes/column-preview`. The separate package test compiles a strict NodeNext consumer against the packed release. The browser trial replays saved clipboard formats through DOM paste events in Chromium.
 
 Tabulator 6.7.1 appends approved records via its clipboard parser and built-in insert action. A Gridclip 1.0.0 importer updates existing cells via applyPaste, retaining the destination row when a source row needs review. Jspreadsheet CE 4.15.0 uses its native before-paste hook to veto a whole rectangle when any row needs review, or to paste the approved fields through its own text-cell writer. Each importer chooses its own commit behavior from the same preview. Single-field pastes update only their mapped field. The trials assert the complete destination state, including neighboring cells.
 
@@ -26,4 +26,6 @@ Tabulator 6.7.1 appends approved records via its clipboard parser and built-in i
 
 The unguarded Tabulator and Jspreadsheet importers both wrote the displayed `7` for the Sheets row containing `7.4`. With the preview, both held that row and accepted the genuine seven. The padded product code produced `{ productId: "00123", quantity: 123 }`. In the mixed-blank capture, the preview marked three rows ready and two for review. Tabulator appended three, Gridclip updated the three corresponding destination rows, and Jspreadsheet retained the entire original selection under its all-or-nothing policy.
 
-The tests also exercise consecutive accepted and held events and missing clipboard evidence. Jspreadsheet's document-level handler can receive a paste targeted outside its element. Its adapter consumes each event's preview once. The trials replay previously captured formats in Chromium. A fresh Sheets-to-grid keyboard paste remains the next release check.
+The tests also exercise consecutive accepted and held events and missing clipboard evidence. Jspreadsheet's document-level handler can receive a paste targeted outside its element. Its adapter consumes each event's preview once. The trials replay previously captured formats in Chromium. In a separate native Chrome keyboard trial on macOS, we copied two fresh Sheets cells that both displayed 7. Tabulator appended zero records for the stored 7.4 and one for the stored 7. With C2 selected in Jspreadsheet, its before-paste hook ran twice and committed only the second paste. Both trusted events supplied plain text and usable Sheets stored-value evidence; the HTML display was unavailable.
+
+To repeat the keyboard trial locally, run `npm run dev` from the repo root and open `/prototypes/column-preview/live.html` on that server. Select a grid, copy a Sheets cell, and follow the focus instructions. The event log shows the observed stored number, decision and actual write count.

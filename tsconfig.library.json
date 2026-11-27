@@ -10,5 +10,5 @@
     "rootDir": "src",
     "outDir": "packages/paste-lab/lib"
   },
-  "files": ["src/compare.ts"]
+  "files": ["src/compare.ts", "src/inventory.ts"]
 }

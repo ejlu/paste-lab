@@ -39,6 +39,28 @@ document.addEventListener("paste", (event) => {
 - A final TSV newline can terminate a record or represent a blank single-column cell. The comparison preserves that extra cell when a matching HTML column has one final empty row, or, without a usable HTML grid, when aligned Sheets metadata explicitly marks it blank. Plain text alone keeps its usual record-terminator interpretation.
 - Stored values come from observed layouts of Google's undocumented compact-table format. An unsupported formula or boolean layout leaves stored values unavailable across the range. Dates and percentages can be raw numbers. Each format is limited to one million UTF-16 code units and parsed grids to 20,000 positions.
 
-The comparison function, the `sheetsCompact` MIME constant, and the types `ClipboardComparison`, `CellEvidence`, `DisplayStatus`, and `CompactStatus` form the public API. The fixtures cover Sheets in Chrome on macOS and desktop Excel for Mac. [Live clipboard inspector](https://ejlu.github.io/paste-lab/)
+The comparison function, the `sheetsCompact` MIME constant, and the types `ClipboardComparison`, `CellEvidence`, `DisplayStatus`, and `CompactStatus` form the root API. The fixtures cover Sheets in Chrome on macOS and desktop Excel for Mac. [Live clipboard inspector](https://ejlu.github.io/paste-lab/)
+
+## Inventory preview
+
+Import `previewInventoryPaste` from `paste-lab/inventory` when the destination expects product IDs or whole-unit quantities. Pass the comparison from the root API, zero-based source columns, and an explicit header count of 0 or 1.
+
+```ts
+import { compareClipboardFormats } from "paste-lab";
+import { previewInventoryPaste } from "paste-lab/inventory";
+
+function previewOrder(formats: Record<string, string>) {
+  const preview = previewInventoryPaste(compareClipboardFormats(formats), {
+    columns: { productId: 0, quantity: 1 },
+    headerRows: 1,
+  });
+  if (preview.status === "blocked") return { reason: preview.reason };
+  return preview.rows.map(row => row.status === "ready"
+    ? { record: row.values }
+    : { sourceRow: row.sourceRow, issues: row.issues });
+}
+```
+
+Map either field or both. Product IDs keep their displayed spelling, including leading zeros. Quantities require a stored nonnegative safe integer and matching displayed digits. A ready row carries values and the evidence behind them. A held row carries the source row and issues identifying the field, source column, reason and evidence. Coordinates count from the top left of the original paste, including any header. The caller chooses whether to apply ready rows individually or hold the entire paste. A display-only ID can be ready; a quantity without stored number evidence needs review.
 
 MIT licensed.

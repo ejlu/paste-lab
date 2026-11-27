@@ -1,10 +1,10 @@
-// Copied alongside the emitted declarations by check-types.mjs.
+// Compile against the installed tarball in the clean TypeScript consumer.
 import {
   previewInventoryPaste,
   type PastePreview,
   type ColumnMap,
-} from "./prototypes/column-preview/index.js";
-import { compareClipboardFormats } from "./src/compare.js";
+} from "paste-lab/inventory";
+import { compareClipboardFormats } from "paste-lab";
 const c = compareClipboardFormats({ "text/plain": "00123" });
 const both = previewInventoryPaste(c, {
   columns: { productId: 0, quantity: 1 },
